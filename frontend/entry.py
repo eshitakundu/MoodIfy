@@ -6,6 +6,19 @@ import os
 #loading environment variables
 load_dotenv()
 
+st.set_page_config(
+    page_title="Moodify",
+    layout="centered",
+    page_icon="⭐"
+)
+
+st.markdown("""
+<audio autoplay loop hidden>
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+  Your browser does not support the audio element.
+</audio>
+""", unsafe_allow_html=True)
+
 #custom background
 bg = st.markdown(
     f"""

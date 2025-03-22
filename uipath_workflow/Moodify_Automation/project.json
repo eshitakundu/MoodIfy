@@ -4,7 +4,9 @@
   "description": "Spotify Integration",
   "main": "Main.xaml",
   "dependencies": {
-    "UiPath.System.Activities": "[25.2.1]",
+    "UiPath.Database.Activities": "[1.9.0]",
+    "UiPath.Mail.Activities": "[2.0.10]",
+    "UiPath.System.Activities": "[25.2.2]",
     "UiPath.WebAPI.Activities": "[1.21.1]"
   },
   "webServices": [],
