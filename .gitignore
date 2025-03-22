@@ -1,0 +1,19 @@
+# Python
+*.pyc
+__pycache__/
+.venv/
+env/
+venv/
+
+# Env files
+.env
+
+# UiPath junk (if your root project has uipath_workflow folder)
+uipath_workflow/*.screenshots
+uipath_workflow/*.log
+uipath_workflow/*.json
+uipath_workflow/Logs/*
+uipath_workflow/.local/*
+uipath_workflow/.settings/*
+uipath_workflow/.nuget/*
+uipath_workflow/project.lock.json
