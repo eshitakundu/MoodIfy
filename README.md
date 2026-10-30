@@ -29,7 +29,7 @@ your text ──► crisis check ──► mood reader ──► target mood ─
 
 ![Side A of the cassette: paste a song link, then flip the tape](docs/share.png)
 
-On desktop, side A of the cassette takes the link and side B the message and an optional name. On phones the flip would be cramped, so both sides become one card.  The link is checked before anything is saved: https only, no passwords in the URL, no IP addresses or localhost. Known music sites are labelled by name, and anything else shows its domain so people can see where a link goes before clicking it. Titles and artists come from each site's public oEmbed endpoint, so nobody has to type them.
+On desktop, side A of the cassette takes the link and side B the message and an optional name. On phones the flip would be cramped, so both sides become one card. The link is checked before anything is saved: https only, no passwords in the URL, no IP addresses or localhost. Known music sites are labelled by name, and anything else shows its domain so people can see where a link goes before clicking it. Titles and artists come from each site's public oEmbed endpoint, so nobody has to type them.
 
 Every message then goes through layered moderation before it can reach the public wall:
 
