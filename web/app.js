@@ -164,6 +164,32 @@ async function findRandomChannel() {
 }
 document.querySelectorAll("[data-mode]").forEach((button) => button.addEventListener("click", () => findByText(button.dataset.mode)));
 $("random-channel").addEventListener("click", findRandomChannel);
+// Now playing: songs people shared, topped up with starter songs while the community is small.
+const shuffle = (list) => list.map((item) => [Math.random(), item]).sort((a, b) => a[0] - b[0]).map(([, item]) => item);
+async function loadTicker() {
+  try {
+    const shared = shuffle(await (await fetch("/api/wall?limit=20")).json()).slice(0, 12);
+    let picks = shared;
+    if (shared.length < 12) {
+      const starters = (await (await fetch("/api/capsules")).json()).filter((capsule) => capsule.source === "starter");
+      picks = shuffle([...shared, ...shuffle(starters).slice(0, 12 - shared.length)]);
+    }
+    if (!picks.length) return;
+    const items = picks.map((capsule) => {
+      const item = document.createElement("span");
+      const title = document.createElement("b");
+      title.textContent = capsule.title || capsule.song;
+      const showArtist = capsule.artist && !title.textContent.toLowerCase().includes(capsule.artist.toLowerCase());
+      const credit = capsule.source === "starter" ? "from the starter set" : `shared by ${capsule.author}`;
+      item.append("♪ ", title, `${showArtist ? ` — ${capsule.artist}` : ""} · ${credit}`);
+      return item;
+    });
+    // Two copies so the crawl loops without a gap.
+    $("np-items").replaceChildren(...items, ...items.map((item) => item.cloneNode(true)));
+    $("np-items").style.setProperty("--np-time", `${picks.length * 7}s`);
+  } catch { /* the strip just stays empty */ }
+}
+loadTicker();
 $("another").addEventListener("click", () => lastRequest.kind === "random" ? findRandomChannel() : findByText(lastRequest.mode));
 $("copy-capsule").addEventListener("click", async () => {
   if (!currentCapsule) return;
@@ -278,6 +304,7 @@ shareForm.addEventListener("submit", async (event) => {
       throw new Error(detail || "That transmission couldn't be recorded.");
     }
     await loadWall();
+    loadTicker();
     $("wall-status").textContent = data.support ? `${data.message} ${data.support}` : (data.message || "Your note is now part of the signal.");
     $("wall-status").classList.toggle("is-support", Boolean(data.support));
     shareForm.classList.add("hidden");
