@@ -33,11 +33,14 @@ create table if not exists capsules (
     status text not null default 'visible' check (status in ('visible', 'held', 'hidden', 'crisis')),
     moderation text not null default '',
     submitter text not null default '',
+    color text,
     created_at text not null
 )
 """
 COLUMNS = ("song, artist, url, site, thumbnail, mood, note, author, source, "
-           "status, moderation, submitter, created_at")
+           "status, moderation, submitter, created_at, color")
+# Shell colours a sharer can pick for their cassette.
+CASSETTE_COLORS = ("smoke", "clear", "black", "mint", "lilac", "sky", "amber", "rose")
 
 
 def now() -> str:
@@ -57,6 +60,7 @@ class Capsule(BaseModel):
     author: str
     source: str
     created_at: str
+    color: str | None = None
 
     @computed_field
     @property
@@ -95,6 +99,8 @@ class Store:
     def _migrate(self, con: sqlite3.Connection) -> None:
         """Upgrade a v1 table (song/artist required, no status) by copying it into v2."""
         columns = {row["name"] for row in con.execute("pragma table_info(capsules)")}
+        if "status" in columns and "color" not in columns:
+            con.execute("alter table capsules add column color text")
         if not columns or "status" in columns:
             return
         con.execute("alter table capsules rename to capsules_v1")
@@ -148,11 +154,12 @@ class Store:
     # ---- writes ----
     def add(self, *, mood: str, note: str, author: str, song: str | None = None, artist: str | None = None,
             url: str | None = None, site: str | None = None, thumbnail: str | None = None,
-            status: str = "visible", moderation: str = "", submitter: str = "") -> StoredCapsule:
+            status: str = "visible", moderation: str = "", submitter: str = "",
+            color: str | None = None) -> StoredCapsule:
         with self._connect() as con:
             cursor = con.execute(
-                f"insert into capsules ({COLUMNS}) values (?, ?, ?, ?, ?, ?, ?, ?, 'community', ?, ?, ?, ?)",
-                (song, artist, url, site, thumbnail, mood, note, author, status, moderation, submitter, now()),
+                f"insert into capsules ({COLUMNS}) values (?, ?, ?, ?, ?, ?, ?, ?, 'community', ?, ?, ?, ?, ?)",
+                (song, artist, url, site, thumbnail, mood, note, author, status, moderation, submitter, now(), color),
             )
             row = con.execute("select * from capsules where id = ?", (cursor.lastrowid,)).fetchone()
         return StoredCapsule(**dict(row))
