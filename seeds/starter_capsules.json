@@ -1,0 +1,60 @@
+[
+  {"mood": "joyful", "song": "Happy", "artist": "Pharrell Williams", "note": "For days when the good news finally lands and you want a song that matches the grin."},
+  {"mood": "joyful", "song": "Walking on Sunshine", "artist": "Katrina and the Waves", "note": "Celebration energy. Results came out, the job came through, turn it all the way up."},
+  {"mood": "joyful", "song": "Good as Hell", "artist": "Lizzo", "note": "For when you feel great about yourself and want a song that agrees with you."},
+  {"mood": "joyful", "song": "Gallan Goodiyaan", "artist": "Shankar-Ehsaan-Loy", "note": "Family-wedding happiness in one track. Best shared with friends on a good day."},
+  {"mood": "joyful", "song": "Mr. Blue Sky", "artist": "Electric Light Orchestra", "note": "The sun is out after a long grey stretch, and everything feels easy again."},
+  {"mood": "joyful", "song": "Dancing Queen", "artist": "ABBA", "note": "Pure joy for a dance in your room, no audience needed."},
+
+  {"mood": "sad", "song": "Someone Like You", "artist": "Adele", "note": "For a breakup that still hurts, when you need to cry it out properly."},
+  {"mood": "sad", "song": "Fix You", "artist": "Coldplay", "note": "When something you tried hard at didn't work out and you feel heavy and lost."},
+  {"mood": "sad", "song": "Channa Mereya", "artist": "Arijit Singh", "note": "Heartbreak when you have to let someone you love go. It sits with you in the sadness."},
+  {"mood": "sad", "song": "Liability", "artist": "Lorde", "note": "For feeling like too much for the people around you. A quiet, honest kind of sad."},
+  {"mood": "sad", "song": "Hurt", "artist": "Johnny Cash", "note": "Grief and regret, slow and raw. For the nights when everything aches."},
+  {"mood": "sad", "song": "The Night We Met", "artist": "Lord Huron", "note": "Missing someone you lost and wishing you could go back to the beginning."},
+
+  {"mood": "anxious", "song": "Breathin", "artist": "Ariana Grande", "note": "For anxiety that makes it hard to breathe. A reminder to just keep breathing."},
+  {"mood": "anxious", "song": "Stressed Out", "artist": "twenty one pilots", "note": "Pressure about the future, deadlines and growing up, said out loud."},
+  {"mood": "anxious", "song": "Unwell", "artist": "Matchbox Twenty", "note": "When overthinking makes you feel strange in your own head. You're not the only one."},
+  {"mood": "anxious", "song": "Shake It Out", "artist": "Florence + the Machine", "note": "Before an exam or interview, when the worry is loud and you need to shake it off."},
+  {"mood": "anxious", "song": "Breathe (2 AM)", "artist": "Anna Nalick", "note": "Can't sleep, mind racing at 2am. Slow down and breathe."},
+
+  {"mood": "angry", "song": "Killing in the Name", "artist": "Rage Against the Machine", "note": "Furious at something unfair. Let the anger out loud instead of holding it in."},
+  {"mood": "angry", "song": "Numb", "artist": "Linkin Park", "note": "Frustrated and fed up with being pushed to be someone you're not."},
+  {"mood": "angry", "song": "Before He Cheats", "artist": "Carrie Underwood", "note": "Betrayed and mad at someone who lied to you. Sing it, don't do it."},
+  {"mood": "angry", "song": "Zinda", "artist": "Siddharth Mahadevan", "note": "Turn the rage into fuel. Angry energy for a hard workout or a run."},
+  {"mood": "angry", "song": "Seven Nation Army", "artist": "The White Stripes", "note": "Irritated and ready to push back. A steady stomp for walking it off."},
+
+  {"mood": "lonely", "song": "Eleanor Rigby", "artist": "The Beatles", "note": "For feeling invisible, like nobody notices you. All the lonely people."},
+  {"mood": "lonely", "song": "Dancing On My Own", "artist": "Robyn", "note": "Left out and alone in a crowded room. Dance anyway."},
+  {"mood": "lonely", "song": "Boulevard of Broken Dreams", "artist": "Green Day", "note": "Walking alone at night, far from everyone, with only your own company."},
+  {"mood": "lonely", "song": "Space Song", "artist": "Beach House", "note": "Isolated and drifting, missing someone who feels very far away."},
+  {"mood": "lonely", "song": "Phir Le Aya Dil", "artist": "Arijit Singh", "note": "Living away from home and missing everyone. The heart keeps wandering back."},
+
+  {"mood": "drained", "song": "Let It Be", "artist": "The Beatles", "note": "Exhausted after a long day and too tired to fix anything. Let it be for tonight."},
+  {"mood": "drained", "song": "Holocene", "artist": "Bon Iver", "note": "Burnt out and small. A slow, quiet song for resting your head."},
+  {"mood": "drained", "song": "Iktara", "artist": "Kavita Seth", "note": "Worn out and searching for yourself again. Gentle, like a deep breath."},
+  {"mood": "drained", "song": "Easy On Me", "artist": "Adele", "note": "When you have no energy left and need people, including you, to go easy on you."},
+  {"mood": "drained", "song": "Banana Pancakes", "artist": "Jack Johnson", "note": "Overworked and sleepy. Permission for a slow morning and staying in."},
+
+  {"mood": "nostalgic", "song": "Summer of '69", "artist": "Bryan Adams", "note": "Remembering the best days of your life, back when everything felt possible."},
+  {"mood": "nostalgic", "song": "Yaaron", "artist": "KK", "note": "School days and college friends. For a reunion or old photos with your people."},
+  {"mood": "nostalgic", "song": "Pal", "artist": "KK", "note": "Farewell-day memories. The moments you used to think would last forever."},
+  {"mood": "nostalgic", "song": "1985", "artist": "Bowling for Soup", "note": "Funny nostalgia for growing up and realising the old days are years ago."},
+  {"mood": "nostalgic", "song": "Photograph", "artist": "Ed Sheeran", "note": "Memories kept in old photos, for missing people you love from back then."},
+  {"mood": "nostalgic", "song": "Kal Ho Naa Ho", "artist": "Sonu Nigam", "note": "Childhood throwback that also reminds you to love today while it's here."},
+
+  {"mood": "calm", "song": "Clair de Lune", "artist": "Claude Debussy", "note": "Quiet and peaceful. For a slow evening, rain outside and nothing to rush."},
+  {"mood": "calm", "song": "Weightless", "artist": "Marconi Union", "note": "Made to slow your breathing down. For settling a busy mind into calm."},
+  {"mood": "calm", "song": "Kun Faya Kun", "artist": "A.R. Rahman, Javed Ali, Mohit Chauhan", "note": "Peace and stillness, the kind that feels like being held."},
+  {"mood": "calm", "song": "Bloom", "artist": "The Paper Kites", "note": "Soft and content. A cozy song for a quiet morning with tea."},
+  {"mood": "calm", "song": "Sunset Lover", "artist": "Petit Biscuit", "note": "Relaxed and chill, like watching the sky go orange at the end of the day."},
+
+  {"mood": "hopeful", "song": "Here Comes the Sun", "artist": "The Beatles", "note": "After a long hard winter, things are finally getting better."},
+  {"mood": "hopeful", "song": "Rise Up", "artist": "Andra Day", "note": "Down but not done. For trying again and believing you'll get back up."},
+  {"mood": "hopeful", "song": "Aashayein", "artist": "KK, Salim-Sulaiman", "note": "New hopes and a fresh start. For when you're ready to begin again."},
+  {"mood": "hopeful", "song": "Unstoppable", "artist": "Sia", "note": "Looking forward with strength. Tomorrow feels like something you can face."},
+  {"mood": "hopeful", "song": "Kabhi Kabhi Aditi", "artist": "Rashid Ali", "note": "Sad today, but it will pass. A gentle promise that things will be okay."},
+  {"mood": "hopeful", "song": "Lean on Me", "artist": "Bill Withers", "note": "For lonely days: you're not alone, and someone will help you carry it."},
+  {"mood": "hopeful", "song": "Fight Song", "artist": "Rachel Platten", "note": "Healing and finding your voice again after a hard stretch."}
+]
