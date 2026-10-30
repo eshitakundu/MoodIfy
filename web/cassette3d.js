@@ -207,6 +207,7 @@ function wrap(g, text, x, y, width, lineHeight, maxLines) {
   if (line) g.fillText(line, x, y + lines * lineHeight);
 }
 const ink = { A: "", B: "", name: "" };
+let writing = false;  // while open, the real inputs sit on the label, so it leaves its lines blank
 function labelTexture(side, existing) {
   const c = existing?.image || document.createElement("canvas");
   c.width = 1024; c.height = Math.round(1024 * LABEL_H / LABEL_W);
@@ -219,13 +220,15 @@ function labelTexture(side, existing) {
   [["#c9533f", 12], ["#e4a43b", 12], ["#2f6f8f", 12]].forEach(([color, h], i) => { g.fillStyle = color; g.fillRect(0, c.height - 128 + i * 15, c.width, h); });
   g.fillStyle = "#1b1d22"; g.fillRect(0, c.height - 70, c.width, 22);
   g.font = "600 58px 'Caveat', cursive"; g.fillStyle = "#24262b";
-  if (side === "A") {
+  if (writing) {
+    // blank lines for the inputs on top
+  } else if (side === "A") {
     g.fillText(ink.A ? ink.A.replace(/^https?:\/\/(www\.)?/, "").slice(0, 34) : "a song for you", 60, 92);
   } else if (ink.B) {
     g.font = "600 40px 'Caveat', cursive";
     wrap(g, ink.B, 60, 78, c.width - 200, 30, 2);
   } else g.fillText("what it holds", 60, 92);
-  if (side === "B" && ink.name) { g.font = "600 40px 'Caveat', cursive"; g.fillStyle = "#2f6f8f"; g.fillText(`— ${ink.name}`.slice(0, 30), c.width - 420, c.height * 0.33); g.fillStyle = "#24262b"; }
+  if (!writing && side === "B" && ink.name) { g.font = "600 40px 'Caveat', cursive"; g.fillStyle = "#2f6f8f"; g.fillText(`— ${ink.name}`.slice(0, 30), c.width - 420, c.height * 0.33); g.fillStyle = "#24262b"; }
   g.font = "700 64px 'VT323', monospace"; g.fillText(side, c.width - 92, 96);
   g.font = "400 30px 'IBM Plex Mono', monospace"; g.fillStyle = "#3d4048";
   g.fillText("MOODiFY · COMMUNITY RECORDING", 60, c.height - 92);
@@ -284,7 +287,7 @@ let camZ = 15, targetCamZ = 15;
 function idleDistance() {
   const aspect = canvas.clientWidth / Math.max(canvas.clientHeight, 1);
   const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-  return Math.max(12.6 / (2 * t * aspect), 9 / (2 * t)) + D;
+  return (Math.max(12.6 / (2 * t * aspect), 9 / (2 * t)) + D) * 1.9;  // sits small in the scene until clicked
 }
 let dragging = false, moved = 0, lastX = 0, lastY = 0, spin = 0;
 const side = () => (flipper.classList.contains("is-flipped") ? "B" : "A");
@@ -307,6 +310,7 @@ function open() {
   targetPitch = 0;
   targetCamZ = phone.matches ? idleDistance() * 0.85 : fitDistance();
   form.inert = false;
+  if (!phone.matches) { writing = true; for (const s of ["A", "B"]) labelTexture(s, labels[s].material.map); }
   setTimeout(() => form.querySelector(side() === "A" ? "[name=url]" : "[name=message]")?.focus({ preventScroll: true }), reduced ? 0 : 700);
 }
 function close() {
@@ -315,6 +319,8 @@ function close() {
   targetCamZ = idleDistance();
   targetPitch = 0.18;
   form.inert = !phone.matches;
+  writing = false;
+  for (const s of ["A", "B"]) labelTexture(s, labels[s].material.map);
 }
 stage.querySelector(".tape-close")?.addEventListener("click", close);
 
@@ -385,7 +391,7 @@ function frame() {
   const t = clock.elapsedTime;
   if (state === "idle" && !dragging && !reduced) {
     spin *= 0.95;
-    targetYaw += 0.0035 + spin;
+    targetYaw += spin;  // only drifts after a drag; it does not turn on its own
   }
   const ease = reduced ? 1 : 1 - Math.pow(0.0015, dt);
   yaw += (targetYaw - yaw) * ease;

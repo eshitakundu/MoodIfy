@@ -789,3 +789,33 @@ footer .wordmark { font-size: 2.2rem; }
 /* The darker blue needs white text where it fills a button. */
 .cave .tv-checkin .checkin-actions button:first-child, .tv-result-actions #another { color: #fff; text-shadow: 0 0 2px rgba(0,0,0,.6); }
 .tv-result .artist, .osd-live { color: #7fb6f0; }
+
+/* ---------- writing on the label itself ----------
+   Open on desktop, the form has no card of its own: its inputs are handwriting laid over the 3D label's
+   ruled lines (sizes in container units so they track the label as the camera settles), the reel window
+   and stripes show through, and the buttons sit on the shell under the label. */
+@media (min-width: 601px) {
+  .c3d #share { container-type: size; }
+  .c3d .cassette-face .cassette-label { display: block; padding: 0; background: transparent; box-shadow: none; }
+  .c3d .f-url, .c3d .f-message { position: absolute; left: 5.5%; right: 12%; top: 6%; height: 28%; margin: 0; font-size: 0; color: transparent; }
+  .c3d #share.cassette-form .f-url input, .c3d #share.cassette-form .f-message textarea {
+    width: 100%; margin: 0; padding: 0; color: #24262b; background: transparent; border: 0; border-radius: 0; box-shadow: none; outline: none;
+    caret-color: #2f6f8f; text-align: left; font-family: var(--hand); font-weight: 600; letter-spacing: 0; }
+  .c3d #share.cassette-form .f-url input { height: 13cqh; font-size: 9.5cqh; line-height: 1; }
+  .c3d #share.cassette-form .f-message textarea { height: 100%; font-size: 7.4cqh; line-height: 1.05; resize: none; overflow-y: auto; scrollbar-width: none; }
+  .c3d #share.cassette-form .f-url input::placeholder, .c3d #share.cassette-form .f-message textarea::placeholder { color: rgba(36,38,43,.38); font-size: inherit; }
+  .c3d #share.cassette-form .f-url input:focus, .c3d #share.cassette-form .f-message textarea:focus { background: transparent; }
+  .c3d #share .f-flip, .c3d .cassette-back-actions { position: absolute; top: calc(100% + 16px); left: 0; right: 0; margin: 0 auto; }
+  .c3d #share .f-flip { width: max-content; }
+  .c3d .cassette-back-actions { display: flex; align-items: center; justify-content: center; gap: 10px; width: auto; }
+  .c3d #share button { min-height: 0; padding: 7px 14px; color: #fff; background: rgba(8,10,14,.82); border: 1px solid rgba(255,255,255,.28); border-radius: 999px; font: 600 .74rem/1 var(--mono); letter-spacing: .08em; }
+  .c3d #share button[type=submit], .c3d #share .f-flip { background: #2f7fd6; border-color: #2f7fd6; }
+  .c3d #share button:hover { background: #fff; color: #06080c; }
+  .c3d #share .f-sign { flex: 0 1 220px; display: flex !important; align-items: center; gap: 8px; }
+  .c3d #share.cassette-form .f-sign span { color: rgba(255,255,255,.7); font: 600 .62rem var(--mono); letter-spacing: .1em; }
+  .c3d #share.cassette-form .f-sign input { height: 30px; padding: 0 10px; color: #fff; background: rgba(8,10,14,.6); border: 1px solid rgba(255,255,255,.25); border-radius: 999px; font: 600 1.15rem/1 var(--hand); }
+  .c3d #share.cassette-form .f-sign input::placeholder { color: rgba(255,255,255,.45); }
+  .c3d #share-status { position: absolute; top: calc(100% + 58px); left: 0; right: 0; margin: 0; color: #ffd38a; font: 600 .8rem var(--mono); text-align: center; text-shadow: 0 1px 3px #000; }
+}
+.c3d .tape-stage { height: clamp(380px, 40vw, 500px); }
+@media (min-width: 601px) { .c3d .f-url, .c3d .f-message { right: 17%; } }
