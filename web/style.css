@@ -114,30 +114,37 @@ button.tv:hover .channel small, button.tv:focus-visible .channel small { box-sha
 /* ---------- the broadcast room ----------
    A photographed cave of CRTs. Each lit screen gets a video clipped by a mask cut from the photo
    itself, so the pixel scenes sit exactly inside the glass. The two working sets stand in front. */
-.cave { margin-top: 12px; }
-.cave-room { position: relative; aspect-ratio: 1672 / 941; overflow: hidden; background: #040404; border: 3px solid #1a1a1a; border-radius: 18px; box-shadow: 0 20px 70px #000; }
+.cave { width: 100vw; margin: 0 0 0 calc(50% - 50vw); }
+.cave-room { position: relative; aspect-ratio: 1672 / 941; max-width: 1920px; margin: 0 auto; overflow: hidden; background: var(--pitch); }
 .cave-layer { position: absolute; inset: -3%; background: url("/media/cave/room.webp") center / 100% 100% no-repeat; transition: transform .6s cubic-bezier(.2,.7,.2,1); will-change: transform; }
+/* No frame: the photo fades into the page on every side. */
 .cave-room::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 46%, transparent 52%, rgba(0,0,0,.55) 100%), linear-gradient(180deg, rgba(0,0,0,.35), transparent 18%, transparent 80%, rgba(0,0,0,.5)); }
+  background: linear-gradient(180deg, var(--pitch), transparent 16%, transparent 78%, var(--pitch)),
+    linear-gradient(90deg, var(--pitch), transparent 9%, transparent 91%, var(--pitch)),
+    radial-gradient(ellipse at 50% 48%, transparent 55%, rgba(7,9,8,.55) 100%); }
 .cave-screen { position: absolute; overflow: hidden; -webkit-mask: var(--mask) center / 100% 100% no-repeat; mask: var(--mask) center / 100% 100% no-repeat; }
 .cave-screen video { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; opacity: .9; filter: saturate(1.15) contrast(1.05) brightness(1.08); }
 .cave-screen::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at 50% 45%, rgba(255,255,255,.1), transparent 70%); }
-.cave .tv-checkin, .cave .tv-guide { position: absolute; z-index: 5; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+.cave .tv-checkin { position: absolute; z-index: 5; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
 .cave .tv-checkin { left: 34.5%; bottom: 1.5%; width: 31%; aspect-ratio: 1050 / 1400; }
 .cave .tv-checkin .checkin-copy { width: 86%; padding-top: 46px; }
 .cave .tv-checkin .checkin-copy h1 { font-size: clamp(1.7rem, 2.7vw, 2.9rem); }
 .cave .tv-checkin .checkin-copy textarea { min-height: 54px; font-size: 1.15rem; }
 .cave .tv-checkin .checkin-actions button { padding: 4px 9px; font-size: 1rem; }
-.cave .tv-guide { right: 5%; bottom: 2.5%; width: 19%; aspect-ratio: 1400 / 788; }
-.cave .tv-checkin::before, .cave .tv-guide::before { filter: drop-shadow(0 18px 30px rgba(0,0,0,.9)) brightness(.9); }
+.cave .tv-checkin::before { filter: drop-shadow(0 18px 30px rgba(0,0,0,.9)) brightness(.9); }
+/* No header bar: the logo and the share link float in the dark top edge of the room. */
+.site-header { position: absolute; z-index: 20; top: 0; left: 50%; transform: translateX(-50%); grid-template-columns: 1fr auto; border-bottom: 0; }
+.site-header .wordmark { text-shadow: 0 0 18px rgba(0,0,0,.9); }
+.site-header > a:last-child { text-shadow: 0 0 10px #000; }
 
 @media (max-width: 900px) {
   .cave-room { aspect-ratio: auto; display: flex; flex-direction: column; gap: 10px; padding: 18px 12px; }
   .cave-layer { inset: 0; background-size: cover; background-position: 50% 60%; filter: brightness(.55); }
   .cave-screens { display: none; }
-  .cave .tv-checkin, .cave .tv-guide { position: relative; left: auto; right: auto; bottom: auto; width: 100%; max-width: 460px; margin: 0 auto; transform: none !important; }
+  .cave { width: auto; margin: 0; }
+  .cave-room { padding-top: 70px; }
+  .cave .tv-checkin { position: relative; left: auto; right: auto; bottom: auto; width: 100%; max-width: 460px; margin: 0 auto; transform: none !important; }
   .cave .tv-checkin .checkin-copy h1 { font-size: clamp(2rem, 9vw, 3rem); }
-  .cave .tv-guide { aspect-ratio: 1400 / 788; }
 }
 
 /* ---------- result ---------- */

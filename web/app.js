@@ -22,7 +22,7 @@ const channelVideos = [...document.querySelectorAll(".tv video, .cave-screen vid
 const caveRoom = document.querySelector(".cave-room");
 if (caveRoom && !reducedMotion && matchMedia("(hover: hover) and (min-width: 901px)").matches) {
   const layer = caveRoom.querySelector(".cave-layer");
-  const front = caveRoom.querySelectorAll(".tv-checkin, .tv-guide");
+  const front = caveRoom.querySelectorAll(".tv-checkin");
   caveRoom.addEventListener("pointermove", (event) => {
     const box = caveRoom.getBoundingClientRect();
     const x = (event.clientX - box.left) / box.width - 0.5;
@@ -162,9 +162,11 @@ async function findByText(mode) {
 async function findRandomChannel() {
   lastRequest = { kind: "random" };
   const guide = document.querySelector(".tv-guide .screen");  // a burst of static as the set retunes
-  guide.classList.remove("static");
-  void guide.offsetWidth;
-  guide.classList.add("static");
+  if (guide) {
+    guide.classList.remove("static");
+    void guide.offsetWidth;
+    guide.classList.add("static");
+  }
   $("match-status").textContent = "Scanning the community frequency…";
   setBusy(true);
   try {
