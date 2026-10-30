@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">MoodIfy Signal I</title>
+  <path fill="#EFE8D6" d="M76 42C42 61 24 91 24 128s18 67 52 86l17.3-30c-22.3-12-34.3-31-34.3-56s12-44 34.3-56L76 42Zm104 0-17.3 30c22.3 12 34.3 31 34.3 56s-12 44-34.3 56l17.3 30c34-19 52-49 52-86s-18-67-52-86Z"/>
+  <rect x="111" y="96" width="34" height="96" rx="17" fill="#E5483B"/>
+  <circle cx="128" cy="63" r="21" fill="#E5483B"/>
+</svg>

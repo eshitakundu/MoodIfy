@@ -1,25 +1,419 @@
 :root {
-  --bg: #f6f3ee; --card: #ffffff; --ink: #1d1b19; --muted: #6b655d;
-  --accent: #3b5bdb; --border: #e3ded6; --warn: #fff4e5;
+  --pitch: #070908; --coal: #121512; --metal: #282c28; --edge: #454a45;
+  --phosphor: #9ceb63; --red: #e5483b; --blue: #82c7d0; --paper: #efe8d6; --muted: #b3b8b2;
+  --mono: "IBM Plex Mono", monospace; --display: "League Gothic", Impact, sans-serif; --hand: "Caveat", cursive;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink);
-  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
-main { max-width: 620px; margin: 0 auto; padding: 40px 16px 64px; }
-header h1 { margin: 0; font-size: 2rem; }
-header p { color: var(--muted); margin: 4px 0 24px; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 20px; margin-bottom: 16px; }
-label { font-weight: 600; display: block; margin-bottom: 8px; }
-textarea, input, select { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--border);
-  border-radius: 8px; background: #fff; margin-bottom: 10px; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; }
-button { font: inherit; font-weight: 600; padding: 10px 16px; border-radius: 8px; border: 0;
-  background: var(--accent); color: #fff; cursor: pointer; }
-button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-.hidden { display: none; }
-.meta, .hint { color: var(--muted); font-size: 0.9rem; margin: 0 0 8px; }
-#song { margin: 4px 0 0; }
-.artist { margin: 0 0 12px; color: var(--muted); }
-blockquote { margin: 0 0 12px; padding-left: 12px; border-left: 3px solid var(--accent); }
-.support { background: var(--warn); border-radius: 8px; padding: 12px; }
+html { scroll-behavior: smooth; }
+body { margin: 0; overflow-x: hidden; color: var(--paper); background: var(--pitch); font: 15px/1.5 var(--mono); }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; opacity: .14; background: repeating-linear-gradient(90deg, transparent 0 3px, rgba(255,255,255,.03) 4px), radial-gradient(circle at 50% 0, #2b302c, #070908 48%); }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button, input, select, textarea { border-radius: 7px; }
+.hidden { display: none !important; }
+.sr-only, .skip-link { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip-link:focus { z-index: 99; top: 12px; left: 12px; width: auto; height: auto; padding: 10px; clip: auto; color: var(--pitch); background: var(--paper); }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid var(--phosphor); outline-offset: 3px; }
+
+/* ---------- header ---------- */
+.site-header, main, footer { width: min(1320px, calc(100% - 40px)); margin-inline: auto; }
+.site-header { min-height: 72px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; border-bottom: 1px solid #686d68; }
+.site-header p { margin: 0; color: var(--muted); font-size: .72rem; letter-spacing: .18em; }
+.site-header > a:last-child { justify-self: end; color: var(--paper); font-size: .78rem; text-decoration: none; border-bottom: 1px solid; }
+.wordmark { width: max-content; display: inline-flex; align-items: center; gap: 8px; color: var(--paper); font: 2.6rem/.8 var(--display); letter-spacing: .03em; text-decoration: none; }
+.wordmark img { width: .72em; height: .72em; object-fit: contain; }
+.wordmark .wm-i { color: var(--red); }
+
+/* ---------- the wall ---------- */
+main { display: flex; flex-direction: column; }
+.tv-wall {
+  position: relative; display: grid; gap: 7px; margin-top: 12px; padding: 10px;
+  background: radial-gradient(ellipse at 50% 40%, #1b1e1b, #0a0b0a 70%), #0a0b0a;
+  border: 3px solid #262a26; border-radius: 18px; box-shadow: 0 20px 70px #000, inset 0 0 60px #000;
+}
+
+/* Grunge sets: worn dark metal, thick bezels, knobs and a speaker grille. Sizes vary; style doesn't. */
+.tv { position: relative; min-width: 0; min-height: 0; margin: 0; padding: 4px; display: block; color: var(--paper);
+  text-align: left; font: inherit; background: var(--cab); border: 1px solid #080908; box-shadow: inset 0 0 0 1px #4a4f4a, 0 8px 18px rgba(0,0,0,.55); }
+.tv::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .55; mix-blend-mode: multiply;
+  background: radial-gradient(ellipse at 18% 12%, rgba(0,0,0,.55), transparent 22%), radial-gradient(ellipse at 84% 88%, rgba(0,0,0,.5), transparent 26%),
+    repeating-linear-gradient(115deg, transparent 0 13px, rgba(0,0,0,.18) 13px 14px, transparent 14px 31px),
+    repeating-linear-gradient(8deg, transparent 0 21px, rgba(255,255,255,.05) 21px 22px); }
+.tone-coal  { --cab: linear-gradient(135deg, #363a36, #161916 45%, #343834); }
+.tone-rust  { --cab: linear-gradient(135deg, #3b302a, #171311 45%, #382c25); }
+.tone-steel { --cab: linear-gradient(135deg, #343a3f, #13171a 45%, #31383d); }
+.tone-ash   { --cab: linear-gradient(135deg, #42433d, #1b1c19 45%, #3e3f39); }
+button.tv { cursor: pointer; transition: filter .2s ease; }
+button.tv:hover, button.tv:focus-visible { z-index: 3; filter: brightness(1.18) contrast(1.05); }
+button.tv:hover .channel small, button.tv:focus-visible .channel small { box-shadow: 0 0 12px var(--phosphor); }
+.tv-case { position: relative; height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) 26px; padding: 7px 7px 3px;
+  border: 2px solid #080908; box-shadow: inset 0 0 0 2px #4a4e49, inset 0 0 18px #000; }
+.screen { position: relative; z-index: 2; display: block; min-height: 0; overflow: hidden; isolation: isolate; background: #101411;
+  border: 6px solid #080a08; border-radius: 9% / 7%; box-shadow: inset 0 0 45px 12px #000, 0 0 0 2px #565c56; }
+.screen video { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .82; filter: saturate(1.2) contrast(1.12) brightness(.78); }
+.screen::before { content: ""; position: absolute; z-index: 20; inset: -8%; pointer-events: none; opacity: .7;
+  background: radial-gradient(circle, rgba(255,255,255,.3) 0 .55px, transparent .8px) 0 0 / 3px 3px, radial-gradient(circle, rgba(0,0,0,.55) 0 .65px, transparent .9px) 1px 2px / 4px 4px, radial-gradient(circle, rgba(255,255,255,.18) 0 .45px, transparent .75px) 2px 1px / 5px 5px, repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, rgba(0,0,0,.16) 2px 4px);
+  mix-blend-mode: overlay; animation: grain-shift .14s steps(2,end) infinite; }
+.screen::after { content: ""; position: absolute; z-index: 21; inset: 0; pointer-events: none; border-radius: inherit; box-shadow: inset 0 0 45px 12px #000, inset 0 0 6px rgba(255,255,255,.35); }
+.screen.tuning::after { background: repeating-linear-gradient(0deg, rgba(255,255,255,.35) 0 1px, rgba(0,0,0,.55) 2px 3px); animation: tune .18s steps(2) forwards; }
+
+.tv-controls { position: relative; display: flex; align-items: center; gap: 7px; padding: 3px 6px 0; border-top: 2px solid #080908; }
+.tv-controls i { flex: none; width: 15px; height: 15px; border: 2px solid #090a09; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #777d77 0 8%, #292d29 30% 65%, #080908 68%); }
+.tv-controls span { flex: 1; height: 11px; margin-left: 3px; background: repeating-linear-gradient(90deg, #070807 0 2px, #303530 3px 5px); border: 1px solid #070807; }
+
+/* Channel label on each mood TV */
+.channel { color: var(--paper); position: absolute; z-index: 25; left: 9%; right: 9%; bottom: 8%; display: flex; align-items: end; justify-content: space-between; gap: 6px; text-shadow: 0 1px 8px #000, 0 0 2px #000; }
+.channel b { font: 400 clamp(1.25rem, 1.9vw, 2.2rem)/.9 var(--display); letter-spacing: .03em; }
+/* Narrow sets stack the label so long moods like DRAINED still fit. */
+.tv-portrait .channel, .tv-mini .channel { flex-direction: column-reverse; align-items: flex-start; gap: 3px; left: 10%; right: 6%; }
+.tv-portrait .channel b, .tv-mini .channel b { font-size: clamp(1.05rem, 1.45vw, 1.7rem); }
+.channel small { padding: 1px 5px; color: #0b0d0b; background: var(--phosphor); font-size: .62rem; font-weight: 600; letter-spacing: .06em; text-shadow: none; transition: box-shadow .2s; }
+
+/* Shapes: wide consoles keep their knobs on the side, minis are small and sit lower. */
+.tv-console .tv-case { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr) 14%; }
+.tv-console .tv-controls { flex-direction: column; justify-content: center; padding: 6px 0; border-top: 0; border-left: 2px solid #080908; }
+.tv-console .tv-controls span { width: 60%; height: auto; min-height: 30px; flex: 1; margin: 0; background: repeating-linear-gradient(0deg, #070807 0 2px, #303530 3px 5px); }
+.tv-console .tv-controls i { width: 18px; height: 18px; }
+.tv-portrait .screen { border-radius: 8% / 5%; }
+.tv-mini { padding: 3px; }
+.tv-mini .tv-case { grid-template-rows: minmax(0, 1fr) 16px; padding: 5px 5px 2px; }
+.tv-mini .tv-controls i { width: 10px; height: 10px; }
+
+/* The check-in set */
+.tv-checkin { padding: 6px; --cab: linear-gradient(135deg, #3a3e3a, #171a17 45%, #363a36); }
+.tv-checkin .tv-case { grid-template-rows: minmax(0, 1fr) 26px; }
+.tv-checkin .screen { background: #c5c9c5 url("/static/media/mood-receiver-glass-v3.webp") center / cover no-repeat; color: #101412; border-width: 3px; border-radius: 8% / 6%; box-shadow: inset 0 0 42px 18px rgba(0,0,0,.72), 0 0 0 2px #667371, 0 0 18px rgba(111,194,196,.16); }
+.tv-checkin .screen::before { opacity: .28; mix-blend-mode: soft-light; }
+.tv-checkin .screen::after { background: linear-gradient(104deg, transparent 0 43%, rgba(157,225,226,.09) 48%, transparent 53%); background-size: 220% 100%; box-shadow: inset 0 0 42px 16px rgba(0,0,0,.62), inset 0 0 5px rgba(196,235,232,.38); animation: receiver-sweep 7s ease-in-out infinite; }
+.checkin-head { position: absolute; z-index: 5; top: 14px; left: 18px; right: 18px; display: flex; justify-content: space-between; font-size: .7rem; letter-spacing: .08em; }
+.tv-checkin .checkin-head { top: 7%; left: 17%; right: 17%; align-items: center; padding: 6px 10px; color: #d4dfda; background: rgba(6,10,8,.68); border: 1px solid rgba(174,201,193,.28); border-radius: 11px; box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 5px 14px rgba(0,0,0,.28); text-shadow: 0 1px 5px #000; }
+.tv-checkin .checkin-head span:last-child { padding: 2px 7px; color: #a5f079; background: rgba(3,9,6,.72); border: 1px solid rgba(158,235,99,.28); border-radius: 7px; box-shadow: inset 0 0 8px #000, 0 0 9px rgba(156,235,99,.2); }
+.checkin-head span:first-child::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; background: var(--red); border-radius: 50%; animation: blink 1.2s steps(2) infinite; }
+.checkin-copy { position: relative; z-index: 4; width: min(76%, 520px); height: 100%; margin: auto; padding: 62px 0 38px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.checkin-copy h1 { margin: 0 0 14px; font: 400 clamp(2.6rem, min(5vw, 7.4vh), 6rem)/.78 var(--display); letter-spacing: .005em; text-align: center; text-shadow: 1px 0 rgba(151,35,29,.28), -1px 0 rgba(67,157,165,.32), 0 5px 18px rgba(255,255,255,.25); }
+.checkin-copy textarea { width: 100%; min-height: clamp(58px, 10vh, 92px); padding: 13px 15px; color: #101412; background: linear-gradient(180deg, rgba(222,225,218,.82), rgba(180,188,184,.68)); border: 1px solid rgba(19,25,22,.62); border-radius: 11px; box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -10px 22px rgba(42,54,50,.12), 0 7px 18px rgba(0,0,0,.24); resize: vertical; outline: 0; font-size: .95rem; font-weight: 500; text-align: center; }
+.checkin-copy textarea::placeholder { color: #565955; }
+.checkin-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; margin-top: 14px; }
+.checkin-actions button, .result-actions button { padding: 11px 15px; color: var(--paper); background: #151815; border: 1px solid #151815; font-size: .74rem; font-weight: 600; letter-spacing: .04em; }
+.checkin-actions button { border-radius: 10px; background: linear-gradient(180deg, #252b28, #090b0a); border-color: #56605b; box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 5px 12px rgba(0,0,0,.35); }
+.checkin-actions button:first-child { color: #dfffc9; text-shadow: 0 0 8px rgba(156,235,99,.34); }
+.checkin-actions .ghost { color: #14201c; background: linear-gradient(180deg, rgba(224,229,224,.88), rgba(152,166,159,.76)); border-color: #48534e; }
+.checkin-actions button:disabled { opacity: .55; cursor: progress; }
+.hint { margin: 10px 0 0; color: #3e413d; font-size: .7rem; }
+.form-status { min-height: 1.2em; margin: 6px 0 0; color: #9f2722; font-size: .74rem; font-weight: 600; }
+.tv-controls .signal-light { background: radial-gradient(circle at 38% 34%, #e9f7b4 0 8%, var(--phosphor) 18% 35%, #284221 55%, #080908 70%); box-shadow: 0 0 10px rgba(156,235,99,.62); animation: tuner-blink 1.15s steps(2) infinite; }
+.tv-controls .control-ticker { position: relative; height: 13px; overflow: hidden; color: var(--phosphor); background: #070907; box-shadow: inset 0 0 8px #000; }
+.control-ticker b { position: absolute; left: 0; top: 1px; width: max-content; white-space: nowrap; font-size: .55rem; font-weight: 600; line-height: 11px; letter-spacing: .08em; text-shadow: 0 0 6px var(--phosphor); animation: control-crawl 6s linear infinite; }
+
+/* The guide set */
+.tv-guide .screen { display: grid; place-items: center; background: #a6b3ac; color: #101310; }
+.guide-copy { position: relative; z-index: 4; display: grid; gap: 6px; padding: 0 10%; text-align: center; }
+.guide-copy b { font: 400 clamp(2rem, 3.2vw, 3.6rem)/.85 var(--display); }
+.guide-copy small { font-size: .72rem; }
+
+/* ---------- result ---------- */
+.result { margin-top: 56px; padding: 7px; overflow: hidden; scroll-margin-top: 20px; background: linear-gradient(135deg, #444943, #151815 42%, #353a35); border: 2px solid #555b55; border-radius: 24px; box-shadow: 0 20px 70px #000; outline: none; }
+.result-screen { min-height: 470px; display: grid; grid-template-columns: .8fr 1.2fr; overflow: hidden; background: #b7bab2; border: 9px solid #090b09; border-radius: 28px; box-shadow: inset 0 0 55px #000; }
+.result-art { position: relative; display: grid; place-items: center; overflow: hidden; background: var(--mood-color, #9c2e27); border-right: 3px solid #090b09; transition: background .4s; }
+/* The disc spins; a fixed sheen on top keeps the light still while the disc turns under it. */
+.disc { position: relative; width: min(320px, 74%); aspect-ratio: 1; }
+.disc img { display: block; width: 100%; height: 100%; animation: spin 2.4s linear infinite; }
+.disc::after { content: ""; position: absolute; inset: 1%; border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  background: conic-gradient(from 300deg, transparent 0 8%, rgba(255,255,255,.14) 13%, transparent 19% 52%, rgba(255,255,255,.1) 58%, transparent 64%); }
+.disc.drop { animation: drop-in .7s cubic-bezier(.2,.8,.2,1); }
+.result-copy { position: relative; display: flex; flex-direction: column; justify-content: center; padding: clamp(32px, 5vw, 72px); color: #111411; }
+.result-copy::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.06) 4px); }
+.result-copy > * { position: relative; z-index: 1; }
+.found { margin: 0 0 12px; font-size: .74rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.result-copy h2 { margin: 0; font: 400 clamp(3.6rem, 7vw, 7.5rem)/.85 var(--display); overflow-wrap: anywhere; }
+.artist { margin: 12px 0 26px; color: #7b241e; font-weight: 600; }
+blockquote { max-width: 660px; margin: 0; padding-top: 18px; border-top: 2px solid #171917; font-size: .95rem; }
+.author { margin: 12px 0 0; color: #3c3f3b; font-size: .74rem; }
+.listen { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
+.listen a { color: #111411; font-size: .76rem; font-weight: 600; text-underline-offset: 3px; }
+.result-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.support { margin: 0 0 18px; padding: 13px; color: #161916; background: #f1d774; border: 1px solid #161916; font-size: .85rem; }
+
+/* ---------- share (cassette) ---------- */
+.broadcast { width: min(100%, 940px); align-self: center; margin-top: 90px; color: #e9e2d1; }
+.cassette-heading { display: grid; grid-template-columns: 1fr minmax(0, 300px); align-items: end; gap: 6px 24px; margin: 0 4% 14px; }
+.cassette-heading > p:first-child { grid-column: 1 / -1; margin: 0; color: #b3aa98; font-size: .7rem; letter-spacing: .12em; }
+.broadcast h2 { margin: 0; font: 400 clamp(3rem, 5.2vw, 5.5rem)/.82 var(--display); letter-spacing: -.02em; }
+.broadcast-note { margin: 0 0 3px; color: #cfc7b8; font-size: .8rem; }
+.cassette-shell { position: relative; width: 100%; aspect-ratio: 1610 / 977; background: url("/static/media/cassette-form-shell.webp") center/contain no-repeat; filter: drop-shadow(0 18px 28px rgba(0,0,0,.72)); }
+.cassette-label { position: absolute; z-index: 2; inset: 52.5% 7.4% 14.6%; display: grid; grid-template-columns: 1.15fr 1fr .9fr; grid-template-areas: "song artist mood" "note note name" "status status submit"; align-content: center; gap: 4px 14px; padding: 6px 14px; color: #211b15; }
+.f-song { grid-area: song; } .f-artist { grid-area: artist; } .f-mood { grid-area: mood; } .f-note { grid-area: note; } .f-name { grid-area: name; }
+.f-submit { grid-area: submit; } #share-status { grid-area: status; align-self: center; margin: 0; }
+#share label { display: block; min-width: 0; font-size: .62rem; font-weight: 600; letter-spacing: .05em; }
+#share label span { color: #6a6b62; font-weight: 400; }
+#share input, #share select, #share textarea { width: 100%; margin-top: 1px; padding: 3px 1px; color: #17130f; background: transparent; border: 0; border-radius: 4px; outline: 0; font-size: .78rem; }
+#share input::placeholder, #share textarea::placeholder { color: #6d6458; }
+#share input:focus, #share select:focus, #share textarea:focus { border: 0; background: rgba(155,51,38,.07); }
+#share textarea { height: 28px; resize: none; }
+#share button { justify-self: end; min-height: 32px; padding: 4px 12px; color: #f0e9d8; background: #1b1712; border: 1px solid #9b3326; font-size: .68rem; font-weight: 600; }
+#share button:disabled { opacity: .6; }
+
+/* ---------- final art direction pass ---------- */
+/* One family of cabinets: restrained wear, strong silhouettes, no clickable mood labels. */
+.tv { padding: 3px; overflow: hidden; background: linear-gradient(145deg, #333832, #141714 48%, #292e29); border-color: #0d0f0d; border-radius: 12px; box-shadow: inset 0 0 0 1px #4b504a, 0 5px 15px rgba(0,0,0,.62); }
+.tv::after { opacity: .18; }
+.tone-rust, .tone-steel, .tone-ash, .tone-coal { --cab: none; }
+.tv-case { padding: 5px 5px 2px; overflow: hidden; border-width: 1px; border-radius: 9px; box-shadow: inset 0 0 0 1px #4a4e49, inset 0 0 12px #000; }
+.screen { border-width: 3px; border-color: #080b0a; box-shadow: inset 0 0 35px 10px #000, inset 0 0 6px rgba(213,233,227,.18), 0 0 0 2px #66716d, 0 0 12px rgba(111,194,196,.1); }
+.screen video { opacity: 1; filter: saturate(.92) sepia(.06) contrast(1.08) brightness(1.12); }
+.screen.tuning::after { background: none; animation: none; }
+.channel { display: none; }
+.tv-controls { padding-top: 2px; }
+.tv-controls i { width: 13px; height: 13px; }
+button.tv { border-radius: 12px; }
+button.tv:hover, button.tv:focus-visible { filter: brightness(1.08); }
+
+/* A collected wall, not one CSS cabinet resized sixteen times. The generated
+   shells sit above live video apertures, so every set keeps real moving clips. */
+.tv:not(.tv-checkin):not(.tv-guide) { overflow: hidden; padding: 0; background: transparent; border: 0; box-shadow: none; }
+.tv-wall { gap: 1px; padding: 5px; }
+.tv:not(.tv-checkin):not(.tv-guide)::before { content: ""; position: absolute; z-index: 4; inset: 0; pointer-events: none; background: url("/static/media/tv-shell-matte-compact-cutout.webp") center / 100% 100% no-repeat; filter: drop-shadow(0 3px 5px rgba(0,0,0,.72)); }
+.tv:not(.tv-checkin):not(.tv-guide)::after { z-index: 6; opacity: .11; border-radius: 12px; }
+.tv:not(.tv-checkin):not(.tv-guide) .tv-case { position: absolute; z-index: 2; inset: 7% 6% 14%; height: auto; display: block; padding: 0; border: 0; border-radius: 10% / 8%; box-shadow: none; }
+.tv:not(.tv-checkin):not(.tv-guide) .screen { width: 100%; height: 100%; border: 0; border-radius: inherit; box-shadow: inset 0 0 22px 5px rgba(0,0,0,.62); }
+.tv:not(.tv-checkin):not(.tv-guide) .tv-controls { display: none; }
+
+.tv-wide:not(.tv-checkin)::before,
+.tv-console:not(.tv-guide)::before { background-image: url("/static/media/tv-shell-matte-wide-cutout.webp"); }
+.tv-wide:not(.tv-checkin) .tv-case,
+.tv-console:not(.tv-guide) .tv-case { inset: 6% 5.5% 13%; border-radius: 8% / 12%; }
+
+.tv-portrait::before { background-image: url("/static/media/tv-shell-matte-portrait-cutout.webp") !important; }
+.tv-portrait .tv-case { inset: 9% 7.5% 22% !important; border-radius: 16% / 8% !important; }
+
+/* Slight differences stop the repeats from reading as copied props. */
+[style*="--slot: d"]::before, [style*="--slot: i"]::before, [style*="--slot: p"]::before { transform: scaleX(-1); filter: drop-shadow(0 3px 5px rgba(0,0,0,.72)) brightness(.76); }
+[style*="--slot: c"]::before, [style*="--slot: m"]::before { filter: drop-shadow(0 3px 5px rgba(0,0,0,.72)) sepia(.1) brightness(.82); }
+[style*="--slot: f"]::before, [style*="--slot: n"]::before { filter: drop-shadow(0 3px 5px rgba(0,0,0,.72)) brightness(.72); }
+
+/* The two functional hero screens use the same ordinary matte CRT family. */
+.tv-checkin, .tv-guide { overflow: hidden; padding: 0; background: transparent; border: 0; box-shadow: none; }
+.tv-checkin::before, .tv-guide::before { content: ""; position: absolute; z-index: 4; inset: 0; pointer-events: none; background-position: center; background-size: 100% 100%; background-repeat: no-repeat; filter: drop-shadow(0 3px 5px rgba(0,0,0,.72)); }
+.tv-checkin::before { background-image: url("/static/media/tv-shell-matte-portrait-cutout.webp"); }
+.tv-guide::before { background-image: url("/static/media/tv-shell-matte-wide-cutout.webp"); }
+.tv-checkin::after, .tv-guide::after { z-index: 6; opacity: .1; border-radius: 11px; }
+.tv-checkin .tv-case, .tv-guide .tv-case { position: absolute; z-index: 2; height: auto; display: block; padding: 0; border: 0; box-shadow: none; }
+.tv-checkin .tv-case { inset: 9% 7.5% 22%; border-radius: 16% / 8%; }
+.tv-guide .tv-case { inset: 6% 5.5% 13%; border-radius: 8% / 12%; }
+.tv-checkin .screen, .tv-guide .screen { width: 100%; height: 100%; border: 0; border-radius: inherit; box-shadow: inset 0 0 30px 9px #000; }
+.tv-checkin .tv-controls, .tv-guide .tv-controls { display: none; }
+.tv-checkin .checkin-head { top: 5%; left: 12%; right: 12%; padding: 4px 8px; font-size: .58rem; }
+.tv-checkin .checkin-copy { width: 82%; padding: 44px 0 14px; }
+.tv-checkin .checkin-copy h1 { margin-bottom: 8px; font-size: clamp(2rem, min(4vw, 5.2vh), 4.4rem); line-height: .8; }
+.tv-checkin .checkin-copy textarea { min-height: clamp(48px, 8vh, 72px); padding: 8px 10px; font-size: .78rem; }
+.tv-checkin .checkin-actions { flex-wrap: nowrap; gap: 7px; margin-top: 8px; }
+.tv-checkin .checkin-actions button { padding: 8px 10px; font-size: .62rem; white-space: nowrap; }
+.tv-checkin .hint, .tv-checkin .form-status:empty { display: none; }
+.tv-guide .screen { background: #b9b6a9; }
+.tv-guide .screen::before { opacity: .4; }
+.guide-copy { gap: 3px; padding: 8px 6%; }
+.guide-copy small { font-size: .55rem; letter-spacing: .16em; }
+.guide-copy b { font-size: clamp(1.8rem, min(3vw, 5vh), 3.3rem); line-height: .76; }
+.guide-copy em { font-style: normal; font-size: .6rem; font-weight: 600; letter-spacing: .08em; }
+
+/* Dream-lens pass: diffuse footage and soften the physical shells as one wall. */
+.tv-wall::after { content: ""; position: absolute; z-index: 40; inset: 0; pointer-events: none; border-radius: inherit; opacity: .32; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 38%, rgba(224,239,229,.18), transparent 36%), radial-gradient(circle at 16% 18%, rgba(106,129,156,.13), transparent 22%), radial-gradient(circle at 84% 76%, rgba(146,106,86,.1), transparent 24%); box-shadow: inset 0 0 70px 20px rgba(0,0,0,.42); }
+.tv:not(.tv-checkin):not(.tv-guide)::before,
+.tv-checkin::before,
+.tv-guide::before { filter: blur(.48px) saturate(.82) contrast(.94) brightness(.88) drop-shadow(0 3px 7px rgba(0,0,0,.76)); }
+/* Dream lens: soft-focus footage with a gentle bloom. The blur lives on each video (cheap),
+   not in a backdrop-filter over the whole wall (which re-renders every frame). */
+.tv-wall .screen video { transform: scale(1.04); opacity: 1; filter: blur(1.15px) saturate(.92) contrast(1.04) brightness(1.18); }
+.tv-wall .tv:not(.tv-checkin):not(.tv-guide) .screen::before { opacity: .55; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 42%, rgba(232,244,236,.16), transparent 62%); animation: none; }
+.tv-wall .screen { box-shadow: inset 0 0 24px 6px rgba(0,0,0,.6), 0 0 9px rgba(191,213,207,.12); }
+
+/* The disc itself stays grounded; two mechanical rings travel in opposite directions. */
+.disc img { animation: none; }
+.disc::before, .disc::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; }
+.disc::before { inset: 7%; background: conic-gradient(from 20deg, transparent 0 10%, rgba(255,255,255,.22) 12%, transparent 18% 52%, rgba(143,23,18,.55) 56%, transparent 61%); -webkit-mask: radial-gradient(circle, transparent 0 43%, #000 44% 48%, transparent 49%); mask: radial-gradient(circle, transparent 0 43%, #000 44% 48%, transparent 49%); animation: spin 5.8s linear infinite; }
+.disc::after { inset: 27%; background: conic-gradient(from 160deg, transparent 0 24%, rgba(255,255,255,.35) 27%, transparent 31% 68%, rgba(143,23,18,.8) 71%, transparent 75%); -webkit-mask: radial-gradient(circle, transparent 0 34%, #000 35% 43%, transparent 44%); mask: radial-gradient(circle, transparent 0 34%, #000 35% 43%, transparent 44%); animation: spin-reverse 2.7s linear infinite; }
+
+/* Two real cassette faces, not a rectangular form pretending to be one. */
+.cassette-form { width: 100%; perspective: 1500px; }
+.cassette-flipper { position: relative; width: 100%; aspect-ratio: 1610 / 977; transform-style: preserve-3d; transition: transform .85s cubic-bezier(.45,.05,.25,1); }
+.cassette-flipper.is-flipped { transform: rotateY(180deg); }
+.cassette-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; background-position: center; background-size: contain; background-repeat: no-repeat; filter: drop-shadow(0 18px 28px rgba(0,0,0,.72)); }
+.cassette-front { background-image: url("/static/media/cassette-form-shell.webp"); }
+.cassette-back { background-image: url("/static/media/cassette-form-back.webp"); transform: rotateY(180deg); }
+
+
+.cassette-form .cassette-label { position: absolute; z-index: 2; inset: 53.4% 7.8% 15.2%; color: #241d16; }
+.cassette-label-front { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "url" "flip" "status"; justify-items: center; gap: 10px; padding: 10px 18px; align-content: center; text-align: center; }
+.f-url { grid-area: url; } .f-flip { grid-area: flip; } #share-status { grid-area: status; }
+.cassette-label-back { display: grid; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: none; justify-items: stretch; gap: 4px; padding: 6px 10px 7px; text-align: left; }
+.cassette-back .cassette-label { inset: 57.6% 20.6% 21.2%; }
+.f-message { min-height: 0; display: flex !important; flex-direction: column; }
+.cassette-back-actions { display: flex; align-items: center; gap: 8px; width: 100%; }
+#share .cassette-back-actions button { min-height: 26px; padding: 3px 10px; font-size: .62rem; }
+.f-sign { flex: 1; min-width: 0; display: flex !important; align-items: center; gap: 7px; }
+#share.cassette-form .f-sign span { flex: none; color: #241d16; font-size: .58rem; font-weight: 600; letter-spacing: .08em; }
+#share.cassette-form .f-sign input { min-width: 0; height: 26px; padding: 2px 9px 0; background: rgba(60,40,25,.09); border: 1px dashed rgba(36,29,22,.45); border-radius: 6px; font: 600 1.2rem/1 var(--hand); text-align: left; }
+#share.cassette-form .f-sign input:focus { background: rgba(155,51,38,.09); border-color: #9b3326; }
+#share.cassette-form .f-sign input::placeholder { color: #6d6458; font-size: 1.05rem; }
+.cassette-form label { display: block; min-width: 0; font-size: .62rem; font-weight: 600; letter-spacing: .05em; }
+.cassette-form .f-url, .cassette-form .f-message { width: 100%; }
+#share .f-flip { justify-self: center; }
+.cassette-form label span { color: #6a6b62; font-weight: 400; }
+.cassette-form input, .cassette-form textarea { width: 100%; margin-top: 1px; padding: 3px 1px; color: #17130f; background: transparent; border: 0; border-radius: 4px; outline: 0; font-size: .78rem; text-align: center; }
+.cassette-form input::placeholder { color: #6d6458; }
+.cassette-form input:focus, .cassette-form textarea:focus { border: 0; background: rgba(155,51,38,.07); }
+#share.cassette-form textarea { flex: 1; height: auto; min-height: 0; padding: 4px 2px; resize: none; color: #30251d; font: 600 clamp(1.15rem, 1.75vw, 1.55rem)/1.12 var(--hand); letter-spacing: .015em; text-align: left; }
+.cassette-form textarea::placeholder { color: #77695d; opacity: .78; }
+.cassette-form button { min-height: 32px; padding: 4px 12px; color: #f0e9d8; background: #1b1712; border: 1px solid #9b3326; font-size: .68rem; font-weight: 600; }
+.cassette-form button.ghost { color: #2d251d; background: transparent; border-color: #66584b; }
+.cassette-form button:disabled { opacity: .6; }
+
+/* After transmission the note goes on air: the archive is another bank of TV sets, one note per screen. */
+.community-wall { position: relative; padding: 10px; background: radial-gradient(ellipse at 50% 30%, #1b1e1b, #0a0b0a 70%), #0a0b0a; border: 3px solid #262a26; border-radius: 18px; box-shadow: 0 20px 70px #000, inset 0 0 60px #000; }
+.community-wall header { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 4px 20px; margin: 0 0 10px; padding: 20px 22px 16px; background: linear-gradient(135deg, #363a36, #161916 45%, #343834); border: 2px solid #080908; box-shadow: inset 0 0 0 2px #4a4e49, inset 0 0 18px #000; }
+.community-wall header p:first-child { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: .68rem; letter-spacing: .14em; }
+.community-wall header p:first-child::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 8px; background: var(--red); border-radius: 50%; box-shadow: 0 0 8px var(--red); animation: blink 1.2s steps(2) infinite; }
+.community-wall header h2 { margin: 0; color: var(--paper); font: 400 clamp(2.8rem, 6vw, 5rem)/.85 var(--display); }
+#wall-status { max-width: 360px; min-height: 1.2em; margin: 0; padding: 7px 10px; color: var(--phosphor); background: #070907; border: 1px solid #2c332c; box-shadow: inset 0 0 10px #000; font-size: .72rem; text-shadow: 0 0 6px rgba(156,235,99,.45); }
+#wall-status:empty { display: none; }
+#wall-status.is-support { max-width: none; grid-column: 1 / -1; color: #161916; background: #f1d774; border-color: #161916; text-shadow: none; }
+.wall-notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+/* Each note plays on one of the hero's matte CRT shells (the generic .tv shell rules supply the cabinet). */
+.wall-note { aspect-ratio: 4 / 3; }
+.wall-note:nth-child(4n+2)::before { transform: scaleX(-1); filter: drop-shadow(0 3px 5px rgba(0,0,0,.72)) brightness(.78); }
+.wall-note:nth-child(4n+3)::before { filter: drop-shadow(0 3px 5px rgba(0,0,0,.72)) sepia(.1) brightness(.84); }
+.wall-note .screen { display: flex !important; flex-direction: column; padding: 9% 9% 7%; color: var(--paper); background: radial-gradient(ellipse at 50% 40%, #232a24, #0b0e0c 78%); }
+.wall-note .note-head { position: relative; z-index: 3; display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; color: var(--muted); font-size: .56rem; letter-spacing: .12em; }
+.wall-note .note-head b { padding: 0 5px; color: #0b0d0b; background: var(--phosphor); font-weight: 600; }
+.wall-note blockquote { position: relative; z-index: 3; flex: 1; min-height: 0; margin: 0 0 8px; padding: 0; overflow: hidden; border: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; font: 600 clamp(1.1rem, 1.6vw, 1.4rem)/1.08 var(--hand); text-shadow: 0 0 10px rgba(239,232,214,.28); overflow-wrap: anywhere; }
+.wall-note a { position: relative; z-index: 3; display: block; overflow: hidden; color: var(--phosphor); font-size: .62rem; font-weight: 600; text-decoration: none; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 0 6px rgba(156,235,99,.4); }
+.wall-note a:hover { text-decoration: underline; }
+.wall-note .note-meta { position: relative; z-index: 3; margin: 3px 0 0; overflow: hidden; color: var(--muted); font-size: .58rem; letter-spacing: .04em; text-overflow: ellipsis; white-space: nowrap; }
+.wall-empty { grid-column: 1 / -1; margin: 0; padding: 50px 20px; color: var(--muted); background: #0c0f0d; border: 2px solid #080908; text-align: center; font: 600 1.6rem var(--hand); }
+.wall-controls { display: flex; justify-content: center; gap: 9px; padding: 14px 0 6px; }
+.wall-controls button { padding: 11px 15px; color: var(--paper); background: linear-gradient(180deg, #252b28, #090b0a); border: 1px solid #56605b; border-radius: 10px; box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 5px 12px rgba(0,0,0,.35); font-size: .74rem; font-weight: 600; letter-spacing: .04em; }
+#share-another { color: #dfffc9; text-shadow: 0 0 8px rgba(156,235,99,.34); }
+
+/* ---------- footer ---------- */
+footer { min-height: 150px; margin-top: 70px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 28px; border-top: 1px solid #333833; color: var(--muted); font-size: .76rem; }
+footer p { margin: 0; }
+footer a { color: var(--paper); }
+footer .wordmark { font-size: 2.2rem; }
+
+/* ---------- desktop: the mismatched wall fills the first screen ---------- */
+@media (min-width: 901px) {
+  .tv-wall {
+    height: max(640px, calc(100svh - 92px));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(8, minmax(0, 1fr));
+    grid-template-areas:
+      "a a a b checkin checkin checkin checkin j k k k"
+      "a a a b checkin checkin checkin checkin j k k k"
+      "c c d b checkin checkin checkin checkin l k k k"
+      "c c d e checkin checkin checkin checkin l m m n"
+      "c c f e checkin checkin checkin checkin l m m n"
+      "g g f h checkin checkin checkin checkin o o p n"
+      "g g i h guide guide guide guide o o p q"
+      "g g i h guide guide guide guide o o p q";
+  }
+  .tv { grid-area: var(--slot); }
+  .tv-mini, [style*="--slot: g"], [style*="--slot: o"], [style*="--slot: k"] { margin: 0; }
+}
+
+/* ---------- tablet and phone: check-in first, then the channels ---------- */
+@media (max-width: 900px) {
+  .wall-notes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tv-wall { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 58px; grid-auto-flow: dense; padding: 8px; }
+  .tv { grid-column: span 3; grid-row: span 3; }
+  .tv-checkin { order: -2; grid-column: 1 / -1; grid-row: span 7; }
+  .tv-guide { order: -1; grid-column: 1 / -1; grid-row: span 2; }
+  .tv-portrait { grid-column: span 2; grid-row: span 4; }
+  .tv-wide, .tv-console { grid-column: span 4; grid-row: span 3; }
+  .tv-mini { grid-column: span 2; grid-row: span 2; }
+  .cassette-heading { grid-template-columns: 1fr; }
+  footer { grid-template-columns: 1fr; gap: 10px; padding: 30px 0; }
+}
+@media (max-width: 600px) {
+  .site-header, main, footer { width: min(100% - 20px, 1320px); }
+  .site-header { min-height: 60px; grid-template-columns: 1fr 1fr; }
+  .site-header p { display: none; }
+  .wordmark { font-size: 2.3rem; }
+  .tv-extra:not(.tv-mini) { display: none; }
+  .tv-checkin { grid-row: span 8; }
+  .checkin-copy { width: 88%; }
+  .checkin-copy h1 { font-size: 3.6rem; }
+  .checkin-actions { flex-direction: column; }
+  .channel small { display: none; }
+  .result-screen { grid-template-columns: 1fr; }
+  .result-art { min-height: 220px; border-right: 0; border-bottom: 3px solid #090b09; }
+  .disc { width: 190px; }
+  .result-copy { padding: 30px 22px 38px; }
+  .result-copy h2 { font-size: 4rem; }
+  .result-actions { flex-direction: column; }
+  .broadcast { margin-top: 64px; }
+  .broadcast h2 { font-size: 3rem; }
+  /* On phones the cassette is a header image and the label becomes a normal card. */
+  .cassette-shell { aspect-ratio: auto; padding-top: 34%; background-position: center top; background-size: 100% auto; }
+  .cassette-label { position: relative; inset: auto; display: grid; grid-template-columns: 1fr; grid-template-areas: "song" "artist" "mood" "note" "name" "submit" "status"; gap: 10px; margin: -6% 4% 0; padding: 20px; background: #e9e1cf; border: 4px solid #a84131; box-shadow: 0 10px 28px rgba(0,0,0,.5); }
+  #share label { font-size: .7rem; }
+  #share input, #share select, #share textarea { padding: 7px 1px; font-size: .9rem; }
+  #share textarea { height: 64px; }
+  #share button { justify-self: stretch; min-height: 44px; font-size: .78rem; }
+  .cassette-form { perspective: none; }
+  .cassette-flipper { aspect-ratio: auto; min-height: 540px; transform-style: flat; filter: none; }
+  .cassette-flipper.is-flipped { transform: none; }
+  .cassette-face { padding-top: 40%; background-position: center top; background-size: 100% auto; }
+  .cassette-front { display: block; }
+  .cassette-back { display: none; opacity: 1; transform: none; }
+  .cassette-flipper.is-flipped .cassette-front { display: none; }
+  .cassette-flipper.is-flipped .cassette-back { display: block; }
+  .cassette-form .cassette-label { position: relative; inset: auto; margin: -5% 4% 0; padding: 22px; background: #e9e1cf; border: 4px solid #a84131; box-shadow: 0 10px 28px rgba(0,0,0,.5); }
+  .cassette-back .cassette-label { inset: auto; }
+  .cassette-label-front { grid-template-columns: 1fr; grid-template-areas: "url" "flip" "status"; gap: 11px; }
+  .cassette-label-back { min-height: 300px; }
+  .cassette-form label { font-size: .7rem; }
+  .cassette-form input { padding: 7px 1px; font-size: .9rem; }
+  .cassette-form textarea { height: 150px; font-size: 1.65rem; }
+  .cassette-form button { min-height: 44px; }
+  .community-wall header { grid-template-columns: 1fr; }
+  .wall-notes { grid-template-columns: 1fr; }
+  .wall-note blockquote { font-size: 1.45rem; }
+}
+
+/* Short laptop screens: keep the check-in inside its TV. */
+@media (min-width: 901px) and (max-height: 780px) {
+  .hint { display: none; }
+  .checkin-actions { margin-top: 10px; }
+  .checkin-actions button { padding: 8px 12px; }
+}
+
+@keyframes blink { 50% { opacity: .18; } }
+@keyframes tuner-blink { 50% { filter: brightness(.22); box-shadow: none; } }
+@keyframes control-crawl { to { transform: translateX(-50%); } }
+@keyframes tune { 0% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin-reverse { to { transform: rotate(-360deg); } }
+@keyframes receiver-sweep {
+  0%, 20% { background-position: 170% 0; }
+  58%, 100% { background-position: -90% 0; }
+}
+@keyframes drop-in { from { transform: translateY(-14px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes grain-shift {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(-2%,3%); }
+  50% { transform: translate(3%,-2%); }
+  75% { transform: translate(1%,2%); }
+  100% { transform: translate(-3%,-1%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cassette-flipper { transition: none; }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-play-state: paused !important; transition: none !important; }
+}
+
+/* Phones: the signature gets its own line above the tape buttons. */
+@media (max-width: 600px) {
+  .cassette-back-actions { flex-wrap: wrap; }
+  .f-sign { flex: 1 1 100%; order: -1; }
+  .cassette-back-actions button { flex: 1; padding-inline: 6px; white-space: nowrap; }
+}

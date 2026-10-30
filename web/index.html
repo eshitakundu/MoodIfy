@@ -3,49 +3,212 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MoodIfy</title>
+  <meta name="theme-color" content="#070908">
+  <meta name="description" content="Tell MoodIfy how you feel and get a song someone shared for that exact feeling, with the note they left for you.">
+  <title>MoodIfy · tune into your mood</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=IBM+Plex+Mono:wght@400;500;600&family=League+Gothic&display=swap" rel="stylesheet">
+  <link rel="icon" href="/static/media/moodify-signal-i.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <main>
-    <header>
-      <h1>MoodIfy</h1>
-      <p>Tell it how you feel. Get back a song someone shared for that feeling, and why.</p>
-    </header>
+  <a class="skip-link" href="#feeling">Skip to mood check-in</a>
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="MoodIfy home"><img src="/static/media/moodify-signal-i.svg" alt=""><span>MOOD<span class="wm-i">i</span>FY</span></a>
+    <p>COMMUNITY MUSIC TELEVISION</p>
+    <a href="#leave-one">SHARE A SONG ↓</a>
+  </header>
 
-    <section class="card">
-      <label for="feeling">How are you feeling?</label>
-      <textarea id="feeling" rows="3" maxlength="1000" placeholder="e.g. exam tomorrow and I can't stop overthinking"></textarea>
-      <div class="actions">
-        <button data-mode="relate">Feel understood</button>
-        <button data-mode="lift" class="secondary">Lift me up</button>
+  <main>
+    <section class="tv-wall" aria-label="MoodIfy broadcast wall">
+      <div class="tv tone-rust tv-wide" style="--slot: a">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-steel tv-portrait" style="--slot: b">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-coal" style="--slot: c">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-ash tv-mini tv-extra" style="--slot: d" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i></span></span>
+      </div>
+
+      <div class="tv tone-coal tv-mini tv-extra" style="--slot: e" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i></span></span>
+      </div>
+
+      <div class="tv tone-ash tv-portrait" style="--slot: f">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-rust" style="--slot: g">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-steel tv-portrait" style="--slot: h">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-steel tv-mini tv-extra" style="--slot: i" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i></span></span>
+      </div>
+
+      <article class="tv tone-coal tv-checkin" style="--slot: checkin">
+        <div class="tv-case">
+          <div class="screen">
+            <div class="checkin-head"><span>LIVE INPUT</span><span id="clock">00:00:00</span></div>
+            <div class="checkin-copy">
+              <h1>TELL US HOW<br>IT FEELS.</h1>
+              <label class="sr-only" for="feeling">Describe how you feel</label>
+              <textarea id="feeling" rows="3" maxlength="1000" placeholder="I feel…"></textarea>
+              <div class="checkin-actions">
+                <button type="button" data-mode="relate">FEEL UNDERSTOOD</button>
+                <button type="button" data-mode="lift" class="ghost">LIFT MY MOOD</button>
+              </div>
+              <p class="hint">Feel understood finds a song for how you feel. Lift my mood finds one a step lighter.</p>
+              <p id="match-status" class="form-status" role="status"></p>
+            </div>
+          </div>
+          <div class="tv-controls tv-controls-wide"><i class="signal-light"></i><i></i><span class="control-ticker"><b>SIGNAL FOUND　•　SIGNAL FOUND　•　SIGNAL FOUND　•　SIGNAL FOUND　•　</b></span></div>
+        </div>
+      </article>
+
+      <button type="button" id="random-channel" class="tv tone-rust tv-console tv-guide" style="--slot: guide" aria-label="Tune to a random community song">
+        <span class="tv-case">
+          <span class="screen">
+            <span class="guide-copy"><small>COMMUNITY FREQUENCY</small><b>RANDOM<br>CHANNEL</b><em>PRESS TO TUNE ↻</em></span>
+          </span>
+          <span class="tv-controls"><i></i><i></i><span></span><i></i></span>
+        </span>
+      </button>
+
+      <div class="tv tone-ash tv-mini tv-extra" style="--slot: j" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i></span></span>
+      </div>
+
+      <div class="tv tone-rust tv-console" style="--slot: k">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><i></i><span></span><i></i></span></span>
+      </div>
+
+      <div class="tv tone-coal tv-portrait" style="--slot: l">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-ash tv-wide" style="--slot: m">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video>
+          </span>
+          <span class="tv-controls"><i></i><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-steel tv-portrait tv-extra" style="--slot: n" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-coal tv-extra" style="--slot: o" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i><i></i><span></span></span></span>
+      </div>
+
+      <div class="tv tone-rust tv-mini tv-extra" style="--slot: p" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i></span></span>
+      </div>
+
+      <div class="tv tone-steel tv-mini tv-extra" style="--slot: q" aria-hidden="true">
+        <span class="tv-case"><span class="screen"><video muted playsinline loop preload="auto"></video></span><span class="tv-controls"><i></i></span></span>
       </div>
     </section>
 
-    <section id="result" class="card hidden" aria-live="polite">
-      <p id="support" class="support hidden"></p>
-      <p class="meta" id="reading"></p>
-      <h2 id="song"></h2>
-      <p id="artist" class="artist"></p>
-      <blockquote id="note"></blockquote>
-      <p class="meta" id="author"></p>
-      <button id="another" class="secondary">Another one</button>
+    <section id="result" class="result hidden" aria-live="polite" aria-atomic="true" tabindex="-1">
+      <div class="result-screen">
+        <div class="result-art"><div class="disc"><img src="/static/media/disc.webp" alt="" width="720" height="720"></div></div>
+        <div class="result-copy">
+          <p id="support" class="support hidden"></p>
+          <p class="found"><span id="reading"></span></p>
+          <h2 id="song"></h2>
+          <p id="artist" class="artist"></p>
+          <blockquote id="note"></blockquote>
+          <p id="author" class="author"></p>
+          <div class="listen">
+            <a id="listen-youtube" target="_blank" rel="noopener noreferrer">LISTEN ON YOUTUBE ↗</a>
+            <a id="listen-spotify" target="_blank" rel="noopener noreferrer">LISTEN ON SPOTIFY ↗</a>
+          </div>
+          <div class="result-actions">
+            <button type="button" id="another">ANOTHER SONG ↻</button>
+            <button type="button" id="copy-capsule">COPY THIS SONG</button>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="card">
-      <h3>Share a capsule</h3>
-      <p class="hint">A song that helped you, and a line about why. It goes to the next person who feels that way.</p>
-      <form id="share">
-        <input name="song" placeholder="Song" maxlength="120" required>
-        <input name="artist" placeholder="Artist" maxlength="120" required>
-        <select name="mood" required id="mood-select"></select>
-        <textarea name="note" rows="2" minlength="10" maxlength="280" placeholder="Why this song, for this feeling?" required></textarea>
-        <input name="name" placeholder="Your name (optional)" maxlength="40">
-        <button type="submit">Share capsule</button>
-        <p id="share-status" class="meta"></p>
+    <section id="leave-one" class="broadcast" aria-labelledby="share-title">
+      <div class="cassette-heading" id="cassette-heading">
+        <p>COMMUNITY RECORDING / SIDE A → SIDE B</p>
+        <h2 id="share-title">LEAVE A SONG ON THE AIR.</h2>
+        <p class="broadcast-note">Paste the song. Flip the tape. Leave the feeling in your own handwriting.</p>
+      </div>
+      <form id="share" class="cassette-form">
+        <div id="cassette-flipper" class="cassette-flipper">
+          <section class="cassette-face cassette-front" aria-label="Cassette side A: song details">
+            <div class="cassette-label cassette-label-front">
+              <label class="f-url">SONG LINK<input type="text" inputmode="url" autocomplete="url" name="url" placeholder="Paste a link: YouTube, Spotify, SoundCloud, anywhere" maxlength="500" required></label>
+              <button type="button" id="flip-cassette" class="f-flip">FLIP THE TAPE ↻</button>
+              <p id="share-status" class="form-status" role="status"></p>
+            </div>
+          </section>
+          <section class="cassette-face cassette-back" aria-label="Cassette side B: your message">
+            <div class="cassette-label cassette-label-back">
+              <label class="f-message">WRITE WHAT THIS SONG HOLDS FOR YOU
+                <textarea name="message" rows="4" minlength="10" maxlength="400" placeholder="e.g. This got me through my first month in a new city…" required></textarea>
+              </label>
+              <div class="cassette-back-actions">
+                <button type="button" id="back-to-details" class="ghost">← SIDE A</button>
+                <label class="f-sign"><span>SIGNED</span><input name="name" maxlength="40" placeholder="name (optional)" autocomplete="nickname"></label>
+                <button type="submit">PUT IT ON THE WALL ●</button>
+              </div>
+            </div>
+          </section>
+        </div>
       </form>
+      <section id="community-wall" class="community-wall hidden" aria-labelledby="wall-title">
+        <header>
+          <p>ON AIR · COMMUNITY ARCHIVE</p>
+          <h2 id="wall-title">NOTES LEFT ON THE AIR.</h2>
+          <p id="wall-status" role="status"></p>
+        </header>
+        <div id="wall-notes" class="wall-notes"></div>
+        <div class="wall-controls">
+          <button type="button" id="wall-more" class="hidden">OLDER NOTES ↓</button>
+          <button type="button" id="share-another">RECORD ANOTHER ↻</button>
+        </div>
+      </section>
     </section>
   </main>
+
+  <footer>
+    <a class="wordmark" href="/" aria-label="MoodIfy home"><img src="/static/media/moodify-signal-i.svg" alt=""><span>MOOD<span class="wm-i">i</span>FY</span></a>
+    <p>Started with 50 songs picked by the maintainer. Every song after that comes from someone like you.</p>
+    <p><a href="https://github.com/eshitakundu/MoodIfy">SOURCE ON GITHUB ↗</a></p>
+  </footer>
   <script src="/static/app.js"></script>
 </body>
 </html>
