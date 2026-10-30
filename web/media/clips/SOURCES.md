@@ -1,12 +1,23 @@
-# Video sources
+# Clip sources
 
-Clips 41–46 are short, muted, cropped derivatives of free-to-use Pexels footage:
+Every clip is animated from pixel art released under **CC0** (public domain) on OpenGameArt.org. CC0 needs no attribution, but the artists deserve it.
 
-- 41 — “Car driving at night with headlights on, rainy and wet streets” by Erik Mclean: https://www.pexels.com/video/car-driving-at-night-13643105/
-- 42 — “Nighttime Highway Drive with Headlights” by Ingo Joseph: https://www.pexels.com/video/nighttime-highway-drive-with-headlights-863860/
-- 43 — “Nighttime Rainy Street with Car Headlights” by Gönüldenbirkare: https://www.pexels.com/video/nighttime-rainy-street-with-car-headlights-30393974/
-- 44 — “Nighttime Traffic on Wet Urban Road” by Bhullar Graphic: https://www.pexels.com/video/nighttime-traffic-on-wet-urban-road-30727273/
-- 45 — “Dynamic Abstract Red Light Animation” by Colin Jones: https://www.pexels.com/video/dynamic-abstract-red-light-animation-36046326/
-- 46 — “Nighttime Highway Drive with Passing Traffic” by Altaf Shah: https://www.pexels.com/video/nighttime-highway-drive-with-passing-traffic-31842064/
+The scenes are animated by `scripts/render_pixel_reel.py`: layers scroll at different speeds, and some scenes get rain, twinkling stars or flickering light.
 
-Each derivative is silent, 480×270, approximately 1.2 seconds, and encoded for lightweight web playback.
+| Clip | Scene | Artist | Source |
+|---|---|---|---|
+| 01 | Future city alley | knekko | https://opengameart.org/content/future-city-27 |
+| 02 | Neon city | cottonball | https://opengameart.org/content/neon-city-0 |
+| 03 | City rooftops | Gustavo Saraiva | https://opengameart.org/content/city-parallax-pixel-art |
+| 04 | Warped City 2 | ansimuz | https://opengameart.org/content/warped-city-2 |
+| 05 | City skyline at dusk | FabinhoSC | https://opengameart.org/content/skyline-background |
+| 06 | Warped Ocean View (night) | ansimuz | https://opengameart.org/content/warped-ocean-view |
+| 07 | Warped Miami Synth | ansimuz | https://opengameart.org/content/warped-miami-synth |
+| 08 | City at night, 4 colours | FisherG | https://opengameart.org/content/parallax-city-night-4-colors |
+| 09 | Pixel night city | fridaruiz | https://opengameart.org/content/pixel-night-city |
+| 10 | Seaview | tigitalart | https://opengameart.org/content/background-seaview-parallax |
+| 11 | Warped City | ansimuz | https://opengameart.org/content/warped-city |
+| 12 | Magic Cliffs | ansimuz | https://opengameart.org/content/magic-cliffs-environment |
+| 13 | Space | ansimuz | https://opengameart.org/content/space-background-3 |
+| 14 | Industrial | ansimuz | https://opengameart.org/content/industrial-parallax-background |
+| 15 | Mountain at dusk | ansimuz | https://opengameart.org/content/mountain-at-dusk-background |

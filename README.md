@@ -119,7 +119,7 @@ Interactive docs at `/docs`. Frontend notes are in [docs/frontend-api.md](docs/f
 
 Started in March 2025 as a hackathon prototype (Streamlit, MySQL and a UiPath email workflow), which grew out of the capsule idea in [Trackify](https://github.com/eshitakundu/Trackify). Rebuilt in October 2026 as a tested FastAPI service with an LLM mood reader, retrieval and evals, then turned into a community wall with song links, moderation and a TV-wall interface. The earlier commits are still in the history.
 
-Video clip credits are in [web/media/clips/SOURCES.md](web/media/clips/SOURCES.md).
+The TV wall plays CC0 pixel art from OpenGameArt, animated with parallax, rain and flickering light by `scripts/render_pixel_reel.py`. Artist credits are in [web/media/clips/SOURCES.md](web/media/clips/SOURCES.md).
 
 ## Stack
 

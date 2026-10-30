@@ -19,6 +19,7 @@ setInterval(updateClock, 1000);
 const channelVideos = [...document.querySelectorAll(".tv video")];
 const shouldPlay = (video) => !reducedMotion && video.dataset.visible !== "false" && !document.hidden;
 const cutInterval = () => 700 + Math.random() * 700;
+const CLIP_COUNT = 15;  // media/clips/clip-01.mp4 … clip-15.mp4, made by scripts/render_pixel_reel.py
 
 function runChannels(src, segments) {
   channelVideos.forEach((video) => {
@@ -42,7 +43,7 @@ function runChannels(src, segments) {
 // Fallback if the reel can't load: the individual clips, one file per cut.
 function runClips() {
   const clipUrl = (n) => `/media/clips/clip-${String(n).padStart(2, "0")}.mp4`;
-  const randomClip = () => 1 + Math.floor(Math.random() * 46);
+  const randomClip = () => 1 + Math.floor(Math.random() * CLIP_COUNT);
   channelVideos.forEach((video) => {
     video.loop = true;
     const tune = () => { video.src = clipUrl(randomClip()); if (shouldPlay(video)) video.play().catch(() => {}); };
