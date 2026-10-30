@@ -5,6 +5,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from moodify.app import create_app
+from moodify.links import LinkInfo
+from moodify.moderation import Moderator
 from moodify.matcher import best_capsule
 from moodify.moods import LIFT, MOODS
 from moodify.reader import LexiconReader, LLMReader, in_crisis
@@ -13,7 +15,8 @@ from moodify.store import SEED_FILE, Store
 
 @pytest.fixture()
 def client(tmp_path):
-    return TestClient(create_app(str(tmp_path / "test.db"), reader=LLMReader(api_key="")))
+    return TestClient(create_app(str(tmp_path / "test.db"), reader=LLMReader(api_key=""),
+                                 moderator=Moderator(api_key=""), link_lookup=lambda link: LinkInfo(None, None, None)))
 
 
 def fake_llm(content: str | None = None, status: int = 200) -> LLMReader:
@@ -118,7 +121,7 @@ def test_crisis_text_gets_support_and_never_reaches_a_model(tmp_path):
     calls = []
     reader = fake_llm('{"mood": "sad"}')
     reader.read = lambda text: calls.append(text)  # would record any model call
-    client = TestClient(create_app(str(tmp_path / "c.db"), reader=reader))
+    client = TestClient(create_app(str(tmp_path / "c.db"), reader=reader, moderator=Moderator(api_key="")))
     body = client.post("/api/match", json={"text": "I want to end it all"}).json()
     assert "14416" in body["support"]
     assert body["source"] == "safety" and calls == []
@@ -130,7 +133,7 @@ def test_shared_capsule_is_matched_to_the_next_person(client):
         "note": "Helped me through my first lonely month in a new city", "name": "Asha",
     })
     assert created.status_code == 201
-    assert created.json()["source"] == "community"
+    assert created.json()["capsule"]["source"] == "community"
     body = client.post("/api/match", json={"text": "first month in a new city and so lonely"}).json()
     assert body["capsule"]["song"] == "Ocean Eyes"
 
