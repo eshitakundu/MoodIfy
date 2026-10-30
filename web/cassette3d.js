@@ -336,7 +336,7 @@ canvas.addEventListener("pointermove", (event) => {
   moved += Math.abs(dx) + Math.abs(dy);
   lastX = event.clientX; lastY = event.clientY;
   targetYaw += dx * 0.012; spin = dx * 0.012;
-  targetPitch = THREE.MathUtils.clamp(targetPitch + dy * 0.008, -0.7, 0.7);
+  targetPitch = THREE.MathUtils.clamp(targetPitch + dy * 0.008, -0.45, 0.45);
 });
 canvas.addEventListener("pointerup", () => {
   dragging = false;

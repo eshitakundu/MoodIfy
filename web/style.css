@@ -776,3 +776,12 @@ footer .wordmark { font-size: 2.2rem; }
 .community-wall .wall-empty { width: 100%; background: transparent; border: 0; }
 .rack-reader .rr-head { padding-right: 40px; }
 .community-wall header p:first-child::before { background: #6fe6ff; box-shadow: 0 0 8px rgba(111,230,255,.6); }
+
+/* The tape's canvas reaches up behind the heading and down behind the hint, so a tilted tape is never
+   sliced off at its box; the text sits above it. */
+.c3d .cassette-heading { position: relative; z-index: 2; pointer-events: none; }
+.c3d .cassette-heading * { pointer-events: auto; }
+.c3d .tape-stage > canvas { z-index: 0; top: -200px; height: calc(100% + 200px - 40px); }
+.c3d .tape-stage[data-state="open"] > canvas { top: 0; height: 100%; }
+.c3d .tape-hint, .c3d .tape-colors { z-index: 3; }
+@media (max-width: 600px) { .c3d .tape-stage > canvas { top: 0; height: 340px; } }
