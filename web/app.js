@@ -374,3 +374,62 @@ $("share-another").addEventListener("click", () => {
   setCassetteSide("front");
   shareForm.elements.url.focus();
 });
+
+// The headline types itself, line after line, like a broadcast caption.
+const typed = $("typed");
+if (typed && !reducedMotion) {
+  const lines = ["HOW ARE YOU, REALLY?", "WHAT'S THE FEELING TONIGHT?", "TELL US HOW IT FEELS."];
+  let line = 0, shown = lines[0].length, deleting = true;
+  const step = () => {
+    const target = lines[line];
+    if (deleting) {
+      shown -= 1;
+      if (shown <= 0) { deleting = false; line = (line + 1) % lines.length; }
+    } else if (shown < lines[line].length) {
+      shown += 1;
+    } else {
+      deleting = true;
+      return setTimeout(step, 3800);
+    }
+    typed.textContent = lines[deleting ? line : line].slice(0, Math.max(shown, 0)) || "\u00a0";
+    setTimeout(step, deleting ? 28 : 70);
+  };
+  setTimeout(step, 4200);
+}
+
+// Photo screens change channel every so often, always to a photo no other screen is showing.
+const photoScreens = [...document.querySelectorAll(".hole-still")];
+if (photoScreens.length && !reducedMotion) {
+  fetch("/media/stills/index.json").then((r) => r.json()).then((all) => {
+    const onScreen = new Map(photoScreens.map((el) => [el, el.style.getPropertyValue("--still").match(/\/media[^)"']+/)?.[0]]));
+    const retune = (el) => {
+      const busy = new Set(onScreen.values());
+      const free = all.filter((url) => !busy.has(url));
+      if (free.length) {
+        const next = free[Math.floor(Math.random() * free.length)];
+        el.classList.add("is-tuning");
+        setTimeout(() => {
+          el.style.setProperty("--still", `url(${next})`);
+          onScreen.set(el, next);
+          setTimeout(() => el.classList.remove("is-tuning"), 140);
+        }, 160);
+      }
+      setTimeout(() => retune(el), 6000 + Math.random() * 8000);
+    };
+    photoScreens.forEach((el) => setTimeout(() => retune(el), 2000 + Math.random() * 12000));
+  }).catch(() => {});
+}
+
+// Now and then a set loses signal and drops to static for a moment.
+if (!reducedMotion) {
+  const sets = [...document.querySelectorAll(".cave-hole:not(.hole-static)")];
+  const dropout = () => {
+    const el = sets[Math.floor(Math.random() * sets.length)];
+    if (el && !el.classList.contains("is-dropout")) {
+      el.classList.add("is-dropout", "hole-static");
+      setTimeout(() => el.classList.remove("is-dropout", "hole-static"), 350 + Math.random() * 1100);
+    }
+    setTimeout(dropout, 250 + Math.random() * 900);
+  };
+  if (sets.length) setTimeout(dropout, 1500);
+}
