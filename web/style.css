@@ -819,3 +819,8 @@ footer .wordmark { font-size: 2.2rem; }
 }
 .c3d .tape-stage { height: clamp(380px, 40vw, 500px); }
 @media (min-width: 601px) { .c3d .f-url, .c3d .f-message { right: 17%; } }
+/* Centre the idle tape between the heading and the swatches: the canvas overhangs equally above and
+   below the space left for it, so the tape sits in the middle of that space. */
+.c3d .tape-stage { height: 420px; }
+.c3d .tape-stage > canvas { top: -140px; height: calc(100% - 96px + 280px); }
+.c3d .tape-hint { bottom: 52px; }
