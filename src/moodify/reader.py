@@ -9,6 +9,7 @@ Two readers share one contract (text -> MoodReading):
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -97,18 +98,21 @@ PROMPT = (
 
 class LLMReader:
     def __init__(self, api_key: str | None = None, model: str | None = None,
-                 client: httpx.AsyncClient | None = None, fallback: LexiconReader | None = None):
+                 client: httpx.AsyncClient | None = None, fallback: LexiconReader | None = None,
+                 deadline: float = 10.0):
         self.api_key = api_key if api_key is not None else os.getenv("OPENROUTER_API_KEY", "")
         self.model = model or os.getenv("MOODIFY_MODEL", DEFAULT_MODEL)
         self.client = client  # created on first use: building one loads SSL certificates
         self.fallback = fallback or LexiconReader()
+        # Free models can take 30 s or more. Past this, the instant keyword reading answers instead.
+        self.deadline = deadline
 
     async def read(self, text: str) -> MoodReading:
         if not self.api_key:
             return self.fallback.read(text)
         try:
             self.client = self.client or httpx.AsyncClient(timeout=12)
-            response = await self.client.post(
+            response = await asyncio.wait_for(self.client.post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {self.api_key}"},
                 json={
@@ -121,7 +125,7 @@ class LLMReader:
                         {"role": "user", "content": text[:1000]},
                     ],
                 },
-            )
+            ), self.deadline)
             response.raise_for_status()
             content = response.json()["choices"][0]["message"]["content"]
             match = re.search(r"\{.*?\}", content, re.S)

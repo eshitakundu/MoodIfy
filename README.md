@@ -59,7 +59,7 @@ Read this honestly. I wrote the direct set alongside the keyword list, so 100% t
 
 ## Tests
 
-59 pytest tests cover:
+60 pytest tests cover:
 - the starter set and the mood reader, including every LLM failure mode falling back correctly (mocked transport)
 - retrieval ranking and repeat-skipping
 - crisis handling (asserting the model is never called)

@@ -95,6 +95,14 @@ def test_llm_failures_fall_back_to_lexicon(reader):
     assert (reading.mood, reading.source) == ("drained", "lexicon")
 
 
+def test_slow_model_falls_back_at_the_deadline():
+    async def slow(request: httpx.Request) -> httpx.Response:
+        await asyncio.sleep(5)
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"mood": "sad"}'}}]})
+    reader = LLMReader(api_key="test", client=httpx.AsyncClient(transport=httpx.MockTransport(slow)), deadline=0.2)
+    reading = asyncio.run(reader.read("so tired and burnt out"))
+    assert (reading.mood, reading.source) == ("drained", "lexicon")
+
 def test_crisis_phrases_are_detected():
     assert in_crisis("I want to die")
     assert in_crisis("thinking about self-harm again")
