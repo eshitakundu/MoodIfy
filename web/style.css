@@ -127,6 +127,13 @@ button.tv:hover .channel small, button.tv:focus-visible .channel small { box-sha
 .cave { width: 100vw; margin: 0 0 0 calc(50% - 50vw); }
 .cave-room { position: relative; aspect-ratio: 1672 / 941; max-width: 1920px; margin: 0 auto; overflow: hidden; background: var(--pitch); }
 .cave-layer { position: absolute; inset: -3%; background: url("/media/cave/room.webp") center / 100% 100% no-repeat; transition: transform .6s cubic-bezier(.2,.7,.2,1); will-change: transform; }
+/* Tunnel mode: the sets are empty frames, and a single video plays behind them, so every screen
+   shows its own slice of the same picture. The video stays still while the frames drift, like windows. */
+.cave-behind { display: none; }
+.cave--tunnel .cave-behind { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; filter: saturate(1.15) brightness(1.05); }
+.cave--tunnel .cave-layer { z-index: 1; background: url("/media/cave/tunnel.webp") center / 100% 100% no-repeat, linear-gradient(to top, #050505 9.4%, transparent 9.6%); }
+.cave--tunnel .cave-screens { display: none; }
+.cave--tunnel .cave-layer::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); }
 /* No frame: the photo fades into the page on every side. */
 .cave-room::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
   background: linear-gradient(180deg, var(--pitch), transparent 16%, transparent 78%, var(--pitch)),

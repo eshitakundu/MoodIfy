@@ -86,7 +86,18 @@ function runClips() {
 Promise.all([
   fetch("/media/reel.json").then((r) => { if (!r.ok) throw new Error(); return r.json(); }),
   fetch("/media/reel.mp4").then((r) => { if (!r.ok) throw new Error(); return r.blob(); }),
-]).then(([index, blob]) => runChannels(URL.createObjectURL(blob), index.segments)).catch(runClips);
+]).then(([index, blob]) => {
+  const reel = URL.createObjectURL(blob);
+  // Tunnel mode: one copy of the reel plays straight through behind the empty sets.
+  const behind = document.querySelector(".cave--tunnel .cave-behind");
+  if (behind) {
+    behind.src = reel;
+    if (!reducedMotion) behind.play().catch(() => {});
+  }
+  runChannels(reel, index.segments);
+}).catch(runClips);
+// ?room=cave shows the photographed room with its own screens instead.
+if (new URLSearchParams(location.search).get("room") === "cave") document.querySelector(".cave")?.classList.remove("cave--tunnel");
 if ("IntersectionObserver" in window) {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(({ isIntersecting, target }) => {
