@@ -195,6 +195,6 @@ def test_v1_database_is_upgraded_in_place(tmp_path):
     con.execute("insert into capsules (song, artist, mood, note, author, source, created_at) values"
                 " ('Old Song', 'Old Artist', 'calm', 'a note from before the upgrade', 'Mira', 'community', '2026-01-01')")
     con.commit(); con.close()
-    capsules = Store(path).all()
+    capsules = [c for c in Store(path).all() if c.source == "community"]  # starters get topped up too
     assert [(c.title, c.author) for c in capsules] == [("Old Song", "Mira")]
     assert capsules[0].listen_url.startswith("https://www.youtube.com/results?search_query=")

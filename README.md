@@ -44,7 +44,7 @@ In production `MOODIFY_REQUIRE_MODERATION=1` holds every message if the model ke
 
 ### Starter set
 
-A new community app is empty on day one, so MoodIfy ships with **50 starter songs** across all nine moods, written by me and labelled "MoodIfy starter set" in the API. They are used for matching but never shown on the community wall.
+A new community app is empty on day one, so MoodIfy ships with **200 starter songs** across all nine moods: Bollywood and Indian indie, K-pop and J-pop, Latin, Afrobeats, French, Pakistani and Brazilian classics, and indie from Mitski to Men I Trust. Each has a short note on when it helps, and they are labelled "MoodIfy starter set" in the API. They are used for matching but never shown on the community wall.
 
 ## Evaluation
 
@@ -59,7 +59,7 @@ Read this honestly. I wrote the direct set alongside the keyword list, so 100% t
 
 ## Tests
 
-58 pytest tests cover:
+59 pytest tests cover:
 - the starter set and the mood reader, including every LLM failure mode falling back correctly (mocked transport)
 - retrieval ranking and repeat-skipping
 - crisis handling (asserting the model is never called)
@@ -88,14 +88,14 @@ The site runs on a Cloudflare Python Worker. The same FastAPI app serves `/api/*
 
 ```bash
 npx wrangler d1 create moodify                         # put the id in wrangler.jsonc
-npx wrangler d1 migrations apply moodify --remote      # table + 50 starter songs
+npx wrangler d1 migrations apply moodify --remote      # table + starter songs
 npx wrangler secret put OPENROUTER_API_KEY
 npx wrangler secret put MOODIFY_ADMIN_TOKEN
 npx wrangler secret put MOODIFY_SALT
 uv run pywrangler deploy
 ```
 
-`scripts/make_seed_migration.py` regenerates the migration after editing `seeds/starter_capsules.json`.
+After editing `seeds/starter_capsules.json`, `scripts/make_seed_migration.py <name>` writes the next D1 migration; it only adds songs the database doesn't have. The local SQLite store tops itself up on start.
 
 ## API
 

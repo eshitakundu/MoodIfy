@@ -1,5 +1,6 @@
 import asyncio
 import json
+from collections import Counter
 
 import httpx
 import pytest
@@ -30,9 +31,11 @@ def fake_llm(content: str | None = None, status: int = 200) -> LLMReader:
 
 # --- starter set -----------------------------------------------------------
 
-def test_starter_set_has_50_capsules_covering_every_mood():
+def test_starter_set_has_200_capsules_covering_every_mood():
     starters = json.loads(SEED_FILE.read_text(encoding="utf-8"))
-    assert len(starters) == 50
+    assert len(starters) == 200
+    assert len({(c["song"], c["artist"]) for c in starters}) == 200  # no duplicates
+    assert min(Counter(c["mood"] for c in starters).values()) >= 20
     assert {c["mood"] for c in starters} == set(MOODS)
     assert all(10 <= len(c["note"]) <= 280 for c in starters)
 
@@ -46,9 +49,17 @@ def test_store_seeds_once_and_labels_starters(tmp_path):
     Store(path)
     store = Store(path)  # second open must not seed again
     capsules = store.all()
-    assert len(capsules) == 50
+    assert len(capsules) == 200
     assert {c.source for c in capsules} == {"starter"}
     assert {c.author for c in capsules} == {"MoodIfy starter set"}
+
+
+def test_new_starters_reach_an_existing_database(tmp_path):
+    path = tmp_path / "old.db"
+    store = Store(path)
+    with store._connect() as con:  # simulate a database seeded before the set grew
+        con.execute("delete from capsules where id > 50")
+    assert len(Store(path).all()) == 200
 
 
 # --- mood reading ----------------------------------------------------------

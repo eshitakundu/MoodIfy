@@ -1,4 +1,4 @@
-"""SQLite storage for capsules. Seeds the 50 starter capsules on first run.
+"""SQLite storage for capsules. Seeds the starter capsules, adding new ones as the set grows.
 
 A capsule is either a starter (song + artist, no link) or a community capsule
 (a link, with a title found from the link or typed by the person). Every capsule
@@ -83,8 +83,7 @@ class Store:
         with self._connect() as con:
             self._migrate(con)
             con.execute(SCHEMA)
-            if con.execute("select count(*) from capsules").fetchone()[0] == 0:
-                self._seed(con)
+            self._seed(con)
 
     def _connect(self) -> sqlite3.Connection:
         import sqlite3  # not shipped with the Worker runtime, which uses D1
@@ -105,11 +104,15 @@ class Store:
         con.execute("drop table capsules_v1")
 
     def _seed(self, con: sqlite3.Connection) -> None:
+        """Add any starter capsules this database doesn't have yet, so new seeds reach old databases."""
         starters = json.loads(SEED_FILE.read_text(encoding="utf-8"))
+        have = {(row["song"], row["artist"]) for row in
+                con.execute("select song, artist from capsules where source = 'starter'")}
         con.executemany(
             "insert into capsules (song, artist, mood, note, author, source, created_at) "
             "values (?, ?, ?, ?, ?, 'starter', ?)",
-            [(c["song"], c["artist"], c["mood"], c["note"], STARTER_AUTHOR, now()) for c in starters],
+            [(c["song"], c["artist"], c["mood"], c["note"], STARTER_AUTHOR, now())
+             for c in starters if (c["song"], c["artist"]) not in have],
         )
 
     # ---- reads ----
