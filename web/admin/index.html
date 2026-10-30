@@ -46,8 +46,10 @@
     <p class="sub">Approve or hide notes before they go on the wall. Only you can open this: it needs your admin token.</p>
 
     <form id="login" class="login">
+      <!-- A fixed username so the browser's password manager can save and fill the token. -->
+      <input class="hidden" type="text" name="username" value="admin" autocomplete="username" readonly tabindex="-1" aria-hidden="true">
       <label class="hidden" for="token">Admin token</label>
-      <input id="token" type="password" autocomplete="current-password" placeholder="Paste your MOODIFY_ADMIN_TOKEN" required>
+      <input id="token" name="password" type="password" autocomplete="current-password" placeholder="Paste your MOODIFY_ADMIN_TOKEN" required>
       <button type="submit">OPEN</button>
       <p id="login-msg" role="alert" style="flex-basis: 100%; margin: 0; color: #ff9c90;"></p>
     </form>
