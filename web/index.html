@@ -8,7 +8,7 @@
   <title>MoodIfy · tune into your mood</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=IBM+Plex+Mono:wght@400;500;600&family=League+Gothic&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=IBM+Plex+Mono:wght@400;500;600&family=League+Gothic&family=VT323&display=swap" rel="stylesheet">
   <link rel="icon" href="/media/moodify-signal-i.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/style.css">
 </head>
@@ -77,7 +77,7 @@
             <div class="checkin-copy">
               <h1>TELL US HOW<br>IT FEELS.</h1>
               <label class="sr-only" for="feeling">Describe how you feel</label>
-              <textarea id="feeling" rows="3" maxlength="1000" placeholder="I feel…"></textarea>
+              <textarea id="feeling" rows="3" maxlength="1000" placeholder="> I feel…"></textarea>
               <div class="checkin-actions">
                 <button type="button" data-mode="relate">FEEL UNDERSTOOD</button>
                 <button type="button" data-mode="lift" class="ghost">LIFT MY MOOD</button>
@@ -93,6 +93,7 @@
       <button type="button" id="random-channel" class="tv tone-rust tv-console tv-guide" style="--slot: guide" aria-label="Tune to a random community song">
         <span class="tv-case">
           <span class="screen">
+            <video muted playsinline loop preload="auto"></video>
             <span class="guide-copy"><small>COMMUNITY FREQUENCY</small><b>RANDOM<br>CHANNEL</b><em>PRESS TO TUNE ↻</em></span>
           </span>
           <span class="tv-controls"><i></i><i></i><span></span><i></i></span>

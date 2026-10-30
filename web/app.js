@@ -143,6 +143,10 @@ async function findByText(mode) {
 }
 async function findRandomChannel() {
   lastRequest = { kind: "random" };
+  const guide = document.querySelector(".tv-guide .screen");  // a burst of static as the set retunes
+  guide.classList.remove("static");
+  void guide.offsetWidth;
+  guide.classList.add("static");
   $("match-status").textContent = "Scanning the community frequency…";
   setBusy(true);
   try {
