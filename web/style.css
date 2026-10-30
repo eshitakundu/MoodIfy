@@ -734,7 +734,7 @@ footer .wordmark { font-size: 2.2rem; }
 /* ---------- one accent ----------
    Phosphor cyan on white: it answers the room's cool rim light and stands off its warm rust frames.
    Nothing else on the screen carries colour. */
-.cave .tv-checkin .screen { --accent: #6fe6ff; --accent-glow: rgba(111,230,255,.45); }
+.cave .tv-checkin .screen { --accent: #2f7fd6; --accent-glow: rgba(47,127,214,.5); }
 .osd-live { color: var(--accent); text-shadow: 0 0 2px #000, 0 0 10px var(--accent-glow); }
 .kicker { color: rgba(240,244,250,.72); }
 .cave .tv-checkin .headline { text-shadow: -1px 0 rgba(111,230,255,.55), 1px 0 rgba(255,255,255,.35), 0 0 2px #000, 0 0 18px rgba(111,230,255,.3); animation: none; }
@@ -785,3 +785,7 @@ footer .wordmark { font-size: 2.2rem; }
 .c3d .tape-stage[data-state="open"] > canvas { top: 0; height: 100%; }
 .c3d .tape-hint, .c3d .tape-colors { z-index: 3; }
 @media (max-width: 600px) { .c3d .tape-stage > canvas { top: 0; height: 340px; } }
+
+/* The darker blue needs white text where it fills a button. */
+.cave .tv-checkin .checkin-actions button:first-child, .tv-result-actions #another { color: #fff; text-shadow: 0 0 2px rgba(0,0,0,.6); }
+.tv-result .artist, .osd-live { color: #7fb6f0; }
