@@ -204,12 +204,17 @@ $("copy-capsule").addEventListener("click", async () => {
 // One form, two physical sides. Nothing is posted until the message side is signed.
 const shareForm = $("share");
 const flipper = $("cassette-flipper");
+// Phones show both sides as one form (see style.css), so neither side is ever hidden there.
+const phone = matchMedia("(max-width: 600px)");
+let cassetteSide = "front";
 function setCassetteSide(side) {
+  cassetteSide = side;
   flipper.classList.toggle("is-flipped", side === "back");
-  flipper.querySelector(".cassette-front").inert = side === "back";
-  flipper.querySelector(".cassette-back").inert = side !== "back";
+  flipper.querySelector(".cassette-front").inert = side === "back" && !phone.matches;
+  flipper.querySelector(".cassette-back").inert = side !== "back" && !phone.matches;
 }
 setCassetteSide("front");
+phone.addEventListener("change", () => setCassetteSide(cassetteSide));
 $("flip-cassette").addEventListener("click", () => {
   const link = shareForm.elements.url.value.trim();
   if (!link || /\s/.test(link) || !link.includes(".")) {

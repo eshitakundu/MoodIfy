@@ -465,3 +465,23 @@ footer .wordmark { font-size: 2.2rem; }
   .f-sign { flex: 1 1 100%; order: -1; }
   .cassette-back-actions button { flex: 1; padding-inline: 6px; white-space: nowrap; }
 }
+
+/* Phones: no flip. Both sides of the tape stack into one card under a small cassette picture. */
+@media (max-width: 600px) {
+  .broadcast-note { display: none; }
+  .cassette-form { perspective: none; }
+  .cassette-flipper, .cassette-flipper.is-flipped { min-height: 0; aspect-ratio: auto; transform: none; transition: none; }
+  .cassette-face, .cassette-flipper.is-flipped .cassette-face { position: static; display: block; padding: 0; transform: none; filter: none; background: none; backface-visibility: visible; -webkit-backface-visibility: visible; }
+  .cassette-front { padding-top: 0; }
+  .cassette-front::before { content: ""; display: block; width: 72%; margin: 0 auto -4%; aspect-ratio: 1610 / 977; background: url("/media/cassette-form-shell.webp") center / contain no-repeat; filter: drop-shadow(0 10px 18px rgba(0,0,0,.7)); }
+  .cassette-form .cassette-label { position: relative; inset: auto; margin: 0; padding: 18px 18px 6px; background: #e9e1cf; border: 4px solid #a84131; box-shadow: none; }
+  .cassette-form .cassette-label-front { border-bottom: 0; border-radius: 8px 8px 0 0; justify-items: stretch; text-align: left; }
+  .cassette-form .cassette-label-back { display: block; min-height: 0; padding-top: 6px; padding-bottom: 16px; border-top: 0; border-radius: 0 0 8px 8px; box-shadow: 0 14px 28px rgba(0,0,0,.5); }
+  .cassette-form .cassette-label-front { gap: 2px; padding-bottom: 0; }
+  #share.cassette-form .f-url input { text-align: left; font-size: .78rem; }
+  #share-status:empty { display: none; }
+  #flip-cassette, #back-to-details { display: none; }
+  #share.cassette-form textarea { height: 120px; flex: none; font-size: 1.45rem; }
+  .cassette-back-actions { margin-top: 10px; }
+  .cassette-back-actions button { flex: 1 1 100%; min-height: 46px; font-size: .8rem; }
+}
