@@ -545,3 +545,41 @@ footer .wordmark { font-size: 2.2rem; }
   .cave .tv-checkin .tv-case { inset: 9% 7.5% 22%; border-radius: 16% / 8%; }
   .cave .tv-checkin .checkin-copy { padding-top: 50px; }
 }
+
+/* ---------- the 3D cassette ----------
+   Only applies once cassette3d.js has a WebGL context (it adds .c3d); otherwise the flat form stays. */
+.tape-stage { position: relative; }
+.tape-stage > canvas, .tape-close, .tape-hint, .tape-colors { display: none; }
+.c3d .tape-stage { height: clamp(440px, 52vw, 620px); }
+.c3d .tape-stage > canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: grab; outline: none; touch-action: pan-y; }
+.c3d .tape-stage > canvas:active { cursor: grabbing; }
+.c3d .tape-stage[data-state="open"] > canvas { cursor: default; }
+.c3d .tape-hint { position: absolute; left: 0; right: 0; bottom: 64px; z-index: 3; display: block; margin: 0; color: var(--muted); font: 1.1rem var(--term); letter-spacing: .08em; text-align: center; pointer-events: none; }
+.c3d .tape-colors { position: absolute; left: 50%; bottom: 14px; z-index: 3; display: flex; gap: 10px; transform: translateX(-50%); }
+.tape-colors button { width: 26px; height: 26px; padding: 0; background: var(--swatch); border: 2px solid rgba(255,255,255,.18); border-radius: 50%; cursor: pointer; }
+.tape-colors button[aria-checked="true"] { border-color: #fff; box-shadow: 0 0 0 3px rgba(214,226,248,.35); }
+.c3d .tape-close { position: absolute; top: 8px; right: 8px; z-index: 6; padding: 6px 12px; color: var(--paper); background: rgba(0,0,0,.5); border: 1px solid #555; border-radius: 6px; }
+.c3d .tape-stage[data-state="open"] .tape-close { display: block; }
+.c3d .tape-stage[data-state="open"] .tape-hint { display: none; }
+.c3d #share { position: absolute; z-index: 4; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.c3d .tape-stage.is-settled #share { opacity: 1; pointer-events: auto; }
+.c3d .tape-stage.is-turning #share { opacity: 0; transition: none; }
+.c3d .cassette-flipper { position: relative; width: 100%; height: 100%; min-height: 0; aspect-ratio: auto; transform: none !important; transition: none; }
+.c3d .cassette-face { position: absolute; inset: 0; display: block; padding: 0; background: none; filter: none; transform: none; backface-visibility: visible; -webkit-backface-visibility: visible; }
+.c3d .cassette-front::before { content: none; }
+.c3d .cassette-back, .c3d .is-flipped .cassette-front { display: none; }
+.c3d .is-flipped .cassette-back { display: block; }
+.c3d .cassette-face .cassette-label { position: absolute; inset: 0; margin: 0; padding: 4% 6%; background: #ebe4d3; border: 0; border-radius: 4px; box-shadow: inset 0 -14px 0 #1b1d22; }
+.c3d .cassette-form button { border-color: #1b1d22; }
+.c3d .cassette-form button.ghost { border-color: #5b5f66; }
+
+@media (max-width: 600px) {
+  .c3d .tape-stage { height: auto; }
+  .c3d .tape-stage > canvas { position: relative; height: 340px; }
+  .c3d .tape-hint { position: static; margin: -40px 0 6px; }
+  .c3d .tape-colors { position: static; justify-content: center; margin: 0 0 14px; transform: none; }
+  .c3d .tape-close { display: none !important; }
+  .c3d #share { position: static; opacity: 1; pointer-events: auto; }
+  .c3d .cassette-face { position: relative; }
+  .c3d .cassette-face .cassette-label { position: relative; padding: 18px; box-shadow: inset 0 -10px 0 #1b1d22; }
+}

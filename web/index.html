@@ -109,7 +109,22 @@
         <h2 id="share-title">LEAVE A SONG ON THE AIR.</h2>
         <p class="broadcast-note">Paste the song. Flip the tape. Leave the feeling in your own handwriting.</p>
       </div>
+      <div class="tape-stage" id="tape-stage">
+        <canvas tabindex="0" aria-label="A cassette. Press Enter or click to write on it."></canvas>
+        <button type="button" class="tape-close" aria-label="Put the cassette down">✕</button>
+        <p class="tape-hint" aria-hidden="true">drag to turn it · click to write on it</p>
+        <div class="tape-colors" role="radiogroup" aria-label="Cassette colour">
+          <button type="button" role="radio" data-color="smoke" aria-label="Smoke shell" style="--swatch:#2c3138"></button>
+          <button type="button" role="radio" data-color="clear" aria-label="Clear shell" style="--swatch:#dfe6ee"></button>
+          <button type="button" role="radio" data-color="black" aria-label="Black shell" style="--swatch:#121316"></button>
+          <button type="button" role="radio" data-color="mint" aria-label="Mint shell" style="--swatch:#7fd8b4"></button>
+          <button type="button" role="radio" data-color="lilac" aria-label="Lilac shell" style="--swatch:#b4a0ea"></button>
+          <button type="button" role="radio" data-color="sky" aria-label="Sky shell" style="--swatch:#84c4f2"></button>
+          <button type="button" role="radio" data-color="amber" aria-label="Amber shell" style="--swatch:#f0ae4a"></button>
+          <button type="button" role="radio" data-color="rose" aria-label="Rose shell" style="--swatch:#f09cb4"></button>
+        </div>
       <form id="share" class="cassette-form">
+        <input type="hidden" name="color" value="smoke">
         <div id="cassette-flipper" class="cassette-flipper">
           <section class="cassette-face cassette-front" aria-label="Cassette side A: song details">
             <div class="cassette-label cassette-label-front">
@@ -132,6 +147,7 @@
           </section>
         </div>
       </form>
+      </div>
       <section id="community-wall" class="community-wall hidden" aria-labelledby="wall-title">
         <header>
           <p>ON AIR · COMMUNITY ARCHIVE</p>
@@ -153,5 +169,6 @@
     <p><a href="https://github.com/eshitakundu/MoodIfy">SOURCE ON GITHUB ↗</a></p>
   </footer>
   <script src="/app.js"></script>
+  <script type="module" src="/cassette3d.js"></script>
 </body>
 </html>

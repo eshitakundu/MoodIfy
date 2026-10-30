@@ -333,6 +333,7 @@ shareForm.addEventListener("submit", async (event) => {
     $("wall-status").textContent = data.support ? `${data.message} ${data.support}` : (data.message || "Your note is now part of the signal.");
     $("wall-status").classList.toggle("is-support", Boolean(data.support));
     shareForm.classList.add("hidden");
+    $("tape-stage")?.classList.add("hidden");
     $("cassette-heading").classList.add("hidden");
     $("community-wall").classList.remove("hidden");
     $("community-wall").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
@@ -350,6 +351,7 @@ $("share-another").addEventListener("click", () => {
   $("community-wall").classList.add("hidden");
   $("cassette-heading").classList.remove("hidden");
   shareForm.classList.remove("hidden");
+  $("tape-stage")?.classList.remove("hidden");
   setCassetteSide("front");
   shareForm.elements.url.focus();
 });
