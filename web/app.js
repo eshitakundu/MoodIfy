@@ -16,7 +16,25 @@ setInterval(updateClock, 1000);
 // Every set cuts between clips like a late-night broadcast switcher.
 // All clips live in one reel (media/reel.mp4, index in reel.json), fetched once and shared by
 // every TV. A cut is a jump inside the reel, so screens never go black while a new file loads.
-const channelVideos = [...document.querySelectorAll(".tv video")];
+const channelVideos = [...document.querySelectorAll(".tv video, .cave-screen video")];
+
+// The room drifts a little with the pointer; the sets in front move more, which reads as depth.
+const caveRoom = document.querySelector(".cave-room");
+if (caveRoom && !reducedMotion && matchMedia("(hover: hover) and (min-width: 901px)").matches) {
+  const layer = caveRoom.querySelector(".cave-layer");
+  const front = caveRoom.querySelectorAll(".tv-checkin, .tv-guide");
+  caveRoom.addEventListener("pointermove", (event) => {
+    const box = caveRoom.getBoundingClientRect();
+    const x = (event.clientX - box.left) / box.width - 0.5;
+    const y = (event.clientY - box.top) / box.height - 0.5;
+    layer.style.transform = `translate(${-x * 14}px, ${-y * 9}px)`;
+    front.forEach((set) => { set.style.transform = `translate(${-x * 30}px, ${-y * 16}px)`; });
+  });
+  caveRoom.addEventListener("pointerleave", () => {
+    layer.style.transform = "";
+    front.forEach((set) => { set.style.transform = ""; });
+  });
+}
 const shouldPlay = (video) => !reducedMotion && video.dataset.visible !== "false" && !document.hidden;
 // Slow enough to see the rain and drifting layers before the channel changes.
 const cutInterval = () => 2500 + Math.random() * 1500;
