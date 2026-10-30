@@ -83,17 +83,18 @@ PROMPT = (
 
 class LLMReader:
     def __init__(self, api_key: str | None = None, model: str | None = None,
-                 client: httpx.Client | None = None, fallback: LexiconReader | None = None):
+                 client: httpx.AsyncClient | None = None, fallback: LexiconReader | None = None):
         self.api_key = api_key if api_key is not None else os.getenv("OPENROUTER_API_KEY", "")
         self.model = model or os.getenv("MOODIFY_MODEL", "openrouter/auto")
-        self.client = client or httpx.Client(timeout=20)
+        self.client = client  # created on first use: building one loads SSL certificates
         self.fallback = fallback or LexiconReader()
 
-    def read(self, text: str) -> MoodReading:
+    async def read(self, text: str) -> MoodReading:
         if not self.api_key:
             return self.fallback.read(text)
         try:
-            response = self.client.post(
+            self.client = self.client or httpx.AsyncClient(timeout=20)
+            response = await self.client.post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {self.api_key}"},
                 json={

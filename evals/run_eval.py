@@ -9,12 +9,14 @@ regressions in the offline fallback.
 from __future__ import annotations
 
 import argparse
+import asyncio
+import inspect
 import json
 import sys
 from collections import Counter
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from moodify.reader import LexiconReader, LLMReader  # noqa: E402
 
 CASES = Path(__file__).with_name("mood_cases.jsonl")
@@ -25,6 +27,8 @@ def score(reader, cases):
     hits, misses, sources = 0, [], Counter()
     for case in cases:
         reading = reader.read(case["text"])
+        if inspect.isawaitable(reading):
+            reading = asyncio.run(reading)
         sources[reading.source] += 1
         if reading.mood == case["mood"]:
             hits += 1

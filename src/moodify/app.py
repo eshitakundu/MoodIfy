@@ -3,13 +3,13 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import inspect
 import os
 import re
 from pathlib import Path
-from typing import Callable, Literal
+from typing import Any, Awaitable, Callable, Literal
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -20,7 +20,7 @@ from .moods import MOODS, Mood, target_mood
 from .reader import LLMReader, in_crisis
 from .store import Capsule, StoredCapsule, Store
 
-WEB = Path(__file__).resolve().parent.parent / "web"
+WEB = Path(__file__).resolve().parents[2] / "web"
 URL = re.compile(r"https?://|www\.", re.I)
 PER_HOUR, PER_DAY = 3, 10
 
@@ -105,10 +105,16 @@ def client_key(request: Request, salt: str) -> str:
     return hashlib.sha256(f"{salt}:{ip}".encode()).hexdigest()[:24]
 
 
+async def done(value: Any) -> Any:
+    """The SQLite store answers directly and the D1 store with awaitables; accept both."""
+    return await value if inspect.isawaitable(value) else value
+
+
 def create_app(db_path: str | None = None, reader: LLMReader | None = None,
                moderator: Moderator | None = None,
-               link_lookup: Callable[[SongLink], LinkInfo] = lookup) -> FastAPI:
-    store = Store(db_path or os.getenv("MOODIFY_DB", "data/moodify.db"))
+               link_lookup: Callable[[SongLink], Awaitable[LinkInfo] | LinkInfo] = lookup,
+               store: Any = None) -> FastAPI:
+    store = store or Store(db_path or os.getenv("MOODIFY_DB", "data/moodify.db"))
     mood_reader = reader or LLMReader()
     moderation = moderator or Moderator()
     salt = os.getenv("MOODIFY_SALT", "moodify-local")
@@ -121,28 +127,28 @@ def create_app(db_path: str | None = None, reader: LLMReader | None = None,
             raise HTTPException(status_code=404, detail="Not found")
 
     @app.post("/api/match", response_model=MatchResponse)
-    def match(request: MatchRequest) -> MatchResponse:
+    async def match(request: MatchRequest) -> MatchResponse:
         if in_crisis(request.text):
             # Never send this text to a model; answer with support first.
-            capsule = best_capsule(request.text, store.all("hopeful"), set(request.seen))
+            capsule = best_capsule(request.text, await done(store.all("hopeful")), set(request.seen))
             return MatchResponse(mood="sad", target_mood="hopeful", source="safety",
                                  capsule=capsule, support=SUPPORT)
-        reading = mood_reader.read(request.text)
+        reading = await mood_reader.read(request.text)
         target = target_mood(reading.mood, request.mode)
-        capsule = best_capsule(request.text, store.all(target), set(request.seen))
+        capsule = best_capsule(request.text, await done(store.all(target)), set(request.seen))
         return MatchResponse(mood=reading.mood, target_mood=target, source=reading.source, capsule=capsule)
 
     @app.get("/api/capsules", response_model=list[Capsule])
-    def list_capsules(mood: str | None = None) -> list[Capsule]:
+    async def list_capsules(mood: str | None = None) -> list[Capsule]:
         if mood and mood not in MOODS:
             raise HTTPException(status_code=422, detail=f"mood must be one of {', '.join(MOODS)}")
-        return store.all(mood)
+        return await done(store.all(mood))
 
     @app.post("/api/capsules", response_model=SubmitResponse, status_code=201)
-    def add_capsule(body: NewCapsule, request: Request) -> SubmitResponse:
+    async def add_capsule(body: NewCapsule, request: Request) -> SubmitResponse:
         submitter = client_key(request, salt)
-        if (store.submissions_since(submitter, 1) >= PER_HOUR
-                or store.submissions_since(submitter, 24) >= PER_DAY):
+        if (await done(store.submissions_since(submitter, 1)) >= PER_HOUR
+                or await done(store.submissions_since(submitter, 24)) >= PER_DAY):
             raise HTTPException(status_code=429, detail="You've shared a lot today. Try again a little later.")
 
         link, info = None, LinkInfo(None, None, None)
@@ -151,19 +157,19 @@ def create_app(db_path: str | None = None, reader: LLMReader | None = None,
                 link = parse_link(body.url)
             except LinkError as error:
                 raise HTTPException(status_code=422, detail=str(error)) from None
-            info = link_lookup(link)
+            info = await done(link_lookup(link))
 
         song = body.song or body.title or info.title
         artist = body.artist or info.artist
         # Titles and names are public too, so they're moderated with the message.
-        verdict = moderation.check(" \n".join(filter(None, [body.text, body.title, body.name])))
-        mood = body.mood or ("sad" if verdict.status == "crisis" else mood_reader.read(body.text).mood)
+        verdict = await moderation.check(" \n".join(filter(None, [body.text, body.title, body.name])))
+        mood = body.mood or ("sad" if verdict.status == "crisis" else (await mood_reader.read(body.text)).mood)
 
-        saved: StoredCapsule = store.add(
+        saved: StoredCapsule = await done(store.add(
             song=song, artist=artist, url=link.url if link else None, site=link.site if link else None,
             thumbnail=info.thumbnail, mood=mood, note=body.text, author=body.name or "Anonymous",
             status=verdict.status, moderation=f"{verdict.checked_by}: {verdict.reason}", submitter=submitter,
-        )
+        ))
         public = Capsule(**saved.model_dump(include=set(Capsule.model_fields)))
         return SubmitResponse(
             status=verdict.status, message=STATUS_MESSAGES[verdict.status],
@@ -172,8 +178,8 @@ def create_app(db_path: str | None = None, reader: LLMReader | None = None,
         )
 
     @app.get("/api/wall", response_model=list[Capsule])
-    def wall(before: int | None = Query(default=None, ge=1), limit: int = Query(default=20, ge=1, le=50)):
-        return store.wall(before=before, limit=limit)
+    async def wall(before: int | None = Query(default=None, ge=1), limit: int = Query(default=20, ge=1, le=50)):
+        return await done(store.wall(before=before, limit=limit))
 
     @app.get("/api/moods")
     def moods() -> list[str]:
@@ -181,20 +187,18 @@ def create_app(db_path: str | None = None, reader: LLMReader | None = None,
 
     # ---- maintainer only (needs MOODIFY_ADMIN_TOKEN; returns 404 otherwise) ----
     @app.get("/api/admin/capsules", response_model=list[StoredCapsule], include_in_schema=False)
-    def admin_list(status: str = "held", authorization: str | None = Header(default=None)):
+    async def admin_list(status: str = "held", authorization: str | None = Header(default=None)):
         require_admin(authorization)
-        return store.by_status(status)
+        return await done(store.by_status(status))
 
     @app.post("/api/admin/capsules/{capsule_id}", include_in_schema=False)
-    def admin_set(capsule_id: int, change: StatusChange, authorization: str | None = Header(default=None)):
+    async def admin_set(capsule_id: int, change: StatusChange, authorization: str | None = Header(default=None)):
         require_admin(authorization)
-        if not store.set_status(capsule_id, change.status):
+        if not await done(store.set_status(capsule_id, change.status)):
             raise HTTPException(status_code=404, detail="No such capsule")
         return {"id": capsule_id, "status": change.status}
 
-    @app.get("/", include_in_schema=False)
-    def index() -> FileResponse:
-        return FileResponse(WEB / "index.html")
-
-    app.mount("/static", StaticFiles(directory=WEB), name="static")
+    # On Cloudflare the page is served by Workers Assets; locally FastAPI serves it.
+    if WEB.is_dir():
+        app.mount("/", StaticFiles(directory=WEB, html=True), name="web")
     return app

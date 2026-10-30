@@ -101,14 +101,14 @@ class LinkInfo:
     thumbnail: str | None
 
 
-def lookup(link: SongLink, client: httpx.Client | None = None) -> LinkInfo:
+async def lookup(link: SongLink, client: httpx.AsyncClient | None = None) -> LinkInfo:
     """Best effort: a title and artist from the site's oEmbed, or nothing."""
     endpoint = OEMBED.get(link.site)
     if not endpoint:
         return LinkInfo(None, None, None)
-    client = client or httpx.Client(timeout=6, follow_redirects=True)
+    client = client or httpx.AsyncClient(timeout=6, follow_redirects=True)
     try:
-        response = client.get(endpoint.format(url=quote(link.url, safe="")))
+        response = await client.get(endpoint.format(url=quote(link.url, safe="")))
         response.raise_for_status()
         data = response.json()
     except (httpx.HTTPError, ValueError):

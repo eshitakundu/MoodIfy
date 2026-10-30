@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import httpx
@@ -24,7 +25,7 @@ def fake_llm(content: str | None = None, status: int = 200) -> LLMReader:
         if content is None:
             raise httpx.ConnectTimeout("timed out")
         return httpx.Response(status, json={"choices": [{"message": {"content": content}}]})
-    return LLMReader(api_key="test", client=httpx.Client(transport=httpx.MockTransport(handler)))
+    return LLMReader(api_key="test", client=httpx.AsyncClient(transport=httpx.MockTransport(handler)))
 
 
 # --- starter set -----------------------------------------------------------
@@ -68,7 +69,7 @@ def test_lexicon_matches_word_starts_only():
 
 
 def test_llm_label_is_used_when_valid():
-    reading = fake_llm('{"mood": "lonely"}').read("nobody texts me")
+    reading = asyncio.run(fake_llm('{"mood": "lonely"}').read("nobody texts me"))
     assert (reading.mood, reading.source) == ("lonely", "llm")
 
 
@@ -79,7 +80,7 @@ def test_llm_label_is_used_when_valid():
     fake_llm(None),                         # timeout
 ])
 def test_llm_failures_fall_back_to_lexicon(reader):
-    reading = reader.read("so tired and burnt out")
+    reading = asyncio.run(reader.read("so tired and burnt out"))
     assert (reading.mood, reading.source) == ("drained", "lexicon")
 
 

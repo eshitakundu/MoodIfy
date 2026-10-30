@@ -59,9 +59,9 @@ PROMPT = (
 )
 
 
-def llm_check(message: str, api_key: str, model: str, client: httpx.Client) -> Verdict:
+async def llm_check(message: str, api_key: str, model: str, client: httpx.AsyncClient) -> Verdict:
     try:
-        response = client.post(
+        response = await client.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}"},
             json={"model": model, "temperature": 0, "max_tokens": 60,
@@ -83,12 +83,12 @@ def llm_check(message: str, api_key: str, model: str, client: httpx.Client) -> V
 
 class Moderator:
     def __init__(self, api_key: str | None = None, model: str | None = None,
-                 client: httpx.Client | None = None):
+                 client: httpx.AsyncClient | None = None):
         self.api_key = api_key if api_key is not None else os.getenv("OPENROUTER_API_KEY", "")
         self.model = model or os.getenv("MOODIFY_MODERATION_MODEL", os.getenv("MOODIFY_MODEL", "openrouter/auto"))
-        self.client = client or httpx.Client(timeout=15)
+        self.client = client  # created on first use: building one loads SSL certificates
 
-    def check(self, message: str) -> Verdict:
+    async def check(self, message: str) -> Verdict:
         ruled = rule_check(message)
         if ruled:
             return ruled
@@ -98,4 +98,5 @@ class Moderator:
             if os.getenv("MOODIFY_REQUIRE_MODERATION") == "1":
                 return Verdict("held", "moderation not configured", "rules-only")
             return Verdict("visible", "passed rules", "rules-only")
-        return llm_check(message, self.api_key, self.model, self.client)
+        self.client = self.client or httpx.AsyncClient(timeout=15)
+        return await llm_check(message, self.api_key, self.model, self.client)

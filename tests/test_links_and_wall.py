@@ -1,3 +1,4 @@
+import asyncio
 import sqlite3
 
 import httpx
@@ -18,7 +19,7 @@ def moderator_replying(content: str | None) -> Moderator:
         if content is None:
             raise httpx.ConnectTimeout("down")
         return httpx.Response(200, json={"choices": [{"message": {"content": content}}]})
-    return Moderator(api_key="k", client=httpx.Client(transport=httpx.MockTransport(handler)))
+    return Moderator(api_key="k", client=httpx.AsyncClient(transport=httpx.MockTransport(handler)))
 
 
 def make_client(tmp_path, moderator=None, info=LinkInfo("Ocean Eyes", "Billie Eilish", "https://i.ytimg.com/x.jpg"),
@@ -65,12 +66,12 @@ def test_unsafe_links_are_rejected(raw, reason):
 
 
 def test_lookup_reads_oembed_and_survives_failures():
-    ok = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, json={
+    ok = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(200, json={
         "title": "Ocean Eyes", "author_name": "Billie Eilish", "thumbnail_url": "https://i.ytimg.com/a.jpg"})))
-    assert lookup(parse_link("youtu.be/x"), ok) == LinkInfo("Ocean Eyes", "Billie Eilish", "https://i.ytimg.com/a.jpg")
-    down = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(500)))
-    assert lookup(parse_link("youtu.be/x"), down) == LinkInfo(None, None, None)
-    assert lookup(parse_link("https://my-band.net/x")) == LinkInfo(None, None, None)  # no oEmbed: no request
+    assert asyncio.run(lookup(parse_link("youtu.be/x"), ok)) == LinkInfo("Ocean Eyes", "Billie Eilish", "https://i.ytimg.com/a.jpg")
+    down = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(500)))
+    assert asyncio.run(lookup(parse_link("youtu.be/x"), down)) == LinkInfo(None, None, None)
+    assert asyncio.run(lookup(parse_link("https://my-band.net/x"))) == LinkInfo(None, None, None)  # no oEmbed: no request
 
 
 # --- moderation ------------------------------------------------------------
@@ -97,12 +98,12 @@ def test_rules_pass_ordinary_sad_messages():
     (None, "held"),                    # model down: held, not published
 ])
 def test_llm_moderation_fails_closed(reply, status):
-    assert moderator_replying(reply).check(GOOD_NOTE).status == status
+    assert asyncio.run(moderator_replying(reply).check(GOOD_NOTE)).status == status
 
 
 def test_missing_key_holds_everything_when_moderation_is_required(monkeypatch):
     monkeypatch.setenv("MOODIFY_REQUIRE_MODERATION", "1")
-    assert Moderator(api_key="").check(GOOD_NOTE).status == "held"
+    assert asyncio.run(Moderator(api_key="").check(GOOD_NOTE)).status == "held"
 
 
 # --- sharing by link ---------------------------------------------------------

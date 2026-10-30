@@ -13,8 +13,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
-[tool.setuptools]
-packages = ["moodify"]
+[dependency-groups]
+workers = ["workers-py", "workers-runtime-sdk"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]

@@ -7,7 +7,6 @@ has a moderation status; only "visible" ones are matched or shown on the wall.
 from __future__ import annotations
 
 import json
-import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -15,7 +14,7 @@ from pydantic import BaseModel, computed_field
 
 from .links import search_link
 
-SEED_FILE = Path(__file__).resolve().parent.parent / "seeds" / "starter_capsules.json"
+SEED_FILE = Path(__file__).resolve().parents[2] / "seeds" / "starter_capsules.json"
 STARTER_AUTHOR = "MoodIfy starter set"
 STATUSES = ("visible", "held", "hidden", "crisis")
 
@@ -76,6 +75,8 @@ class StoredCapsule(Capsule):
 
 
 class Store:
+    """Local SQLite store. The Worker uses a D1 store with the same methods (see src/worker.py)."""
+
     def __init__(self, path: str | Path):
         self.path = str(path)
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
@@ -86,6 +87,8 @@ class Store:
                 self._seed(con)
 
     def _connect(self) -> sqlite3.Connection:
+        import sqlite3  # not shipped with the Worker runtime, which uses D1
+
         con = sqlite3.connect(self.path)
         con.row_factory = sqlite3.Row
         return con
