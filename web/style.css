@@ -385,6 +385,9 @@ footer .wordmark { font-size: 2.2rem; }
   .wordmark { font-size: 2.3rem; }
   .tv-extra:not(.tv-mini) { display: none; }
   .tv-checkin { grid-row: span 8; }
+  /* Phones get just the two working sets; a dozen small TVs only squish. */
+  .tv-wall .tv:not(.tv-checkin):not(.tv-guide) { display: none; }
+  .tv-wall .tv-guide { grid-column: 1 / -1; grid-row: span 3; }
   .checkin-copy { width: 88%; }
   .checkin-copy h1 { font-size: 3.6rem; }
   .checkin-actions { flex-direction: column; }
