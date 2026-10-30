@@ -125,7 +125,8 @@ button.tv:hover .channel small, button.tv:focus-visible .channel small { box-sha
    A photographed cave of CRTs. Each lit screen gets a video clipped by a mask cut from the photo
    itself, so the pixel scenes sit exactly inside the glass. The two working sets stand in front. */
 .cave { width: 100vw; margin: 0 0 0 calc(50% - 50vw); }
-.cave-room { position: relative; aspect-ratio: 1672 / 941; max-width: 1920px; margin: 0 auto; overflow: hidden; background: var(--pitch); }
+/* clip, not hidden: a hidden box can still be scrolled by scrollIntoView, which slid the floor out of its fade. */
+.cave-room { position: relative; aspect-ratio: 1672 / 941; max-width: 1920px; margin: 0 auto; overflow: hidden; overflow: clip; background: var(--pitch); }
 .cave-layer { position: absolute; inset: -3%; background: url("/media/cave/room.webp") center / 100% 100% no-repeat; transition: transform .6s cubic-bezier(.2,.7,.2,1); will-change: transform; }
 /* Room of empty sets: the photo's screens are transparent, and each one gets its own picture behind
    the frame. The biggest play scenes, the rest hold a still frame or static, so the wall stays light. */
