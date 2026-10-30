@@ -47,7 +47,7 @@
 
     <form id="login" class="login">
       <!-- A fixed username so the browser's password manager can save and fill the token. -->
-      <input class="hidden" type="text" name="username" value="admin" autocomplete="username" readonly tabindex="-1" aria-hidden="true">
+      <input style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;" type="text" name="username" value="admin" autocomplete="username" readonly tabindex="-1" aria-hidden="true">
       <label class="hidden" for="token">Admin token</label>
       <input id="token" name="password" type="password" autocomplete="current-password" placeholder="Paste your MOODIFY_ADMIN_TOKEN" required>
       <button type="submit">OPEN</button>
