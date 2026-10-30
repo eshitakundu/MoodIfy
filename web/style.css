@@ -1,0 +1,25 @@
+:root {
+  --bg: #f6f3ee; --card: #ffffff; --ink: #1d1b19; --muted: #6b655d;
+  --accent: #3b5bdb; --border: #e3ded6; --warn: #fff4e5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 620px; margin: 0 auto; padding: 40px 16px 64px; }
+header h1 { margin: 0; font-size: 2rem; }
+header p { color: var(--muted); margin: 4px 0 24px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; margin-bottom: 16px; }
+label { font-weight: 600; display: block; margin-bottom: 8px; }
+textarea, input, select { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 8px; background: #fff; margin-bottom: 10px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+button { font: inherit; font-weight: 600; padding: 10px 16px; border-radius: 8px; border: 0;
+  background: var(--accent); color: #fff; cursor: pointer; }
+button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.hidden { display: none; }
+.meta, .hint { color: var(--muted); font-size: 0.9rem; margin: 0 0 8px; }
+#song { margin: 4px 0 0; }
+.artist { margin: 0 0 12px; color: var(--muted); }
+blockquote { margin: 0 0 12px; padding-left: 12px; border-left: 3px solid var(--accent); }
+.support { background: var(--warn); border-radius: 8px; padding: 12px; }

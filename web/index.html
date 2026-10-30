@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MoodIfy</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>MoodIfy</h1>
+      <p>Tell it how you feel. Get back a song someone shared for that feeling, and why.</p>
+    </header>
+
+    <section class="card">
+      <label for="feeling">How are you feeling?</label>
+      <textarea id="feeling" rows="3" maxlength="1000" placeholder="e.g. exam tomorrow and I can't stop overthinking"></textarea>
+      <div class="actions">
+        <button data-mode="relate">Feel understood</button>
+        <button data-mode="lift" class="secondary">Lift me up</button>
+      </div>
+    </section>
+
+    <section id="result" class="card hidden" aria-live="polite">
+      <p id="support" class="support hidden"></p>
+      <p class="meta" id="reading"></p>
+      <h2 id="song"></h2>
+      <p id="artist" class="artist"></p>
+      <blockquote id="note"></blockquote>
+      <p class="meta" id="author"></p>
+      <button id="another" class="secondary">Another one</button>
+    </section>
+
+    <section class="card">
+      <h3>Share a capsule</h3>
+      <p class="hint">A song that helped you, and a line about why. It goes to the next person who feels that way.</p>
+      <form id="share">
+        <input name="song" placeholder="Song" maxlength="120" required>
+        <input name="artist" placeholder="Artist" maxlength="120" required>
+        <select name="mood" required id="mood-select"></select>
+        <textarea name="note" rows="2" minlength="10" maxlength="280" placeholder="Why this song, for this feeling?" required></textarea>
+        <input name="name" placeholder="Your name (optional)" maxlength="40">
+        <button type="submit">Share capsule</button>
+        <p id="share-status" class="meta"></p>
+      </form>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
