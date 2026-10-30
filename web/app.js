@@ -16,7 +16,11 @@ setInterval(updateClock, 1000);
 // Every set cuts between clips like a late-night broadcast switcher.
 // All clips live in one reel (media/reel.mp4, index in reel.json), fetched once and shared by
 // every TV. A cut is a jump inside the reel, so screens never go black while a new file loads.
-const channelVideos = [...document.querySelectorAll(".tv video, .cave-screen video")];
+// ?room=cave shows the photographed room with its own screens; otherwise the room of empty sets.
+if (new URLSearchParams(location.search).get("room") === "cave") document.querySelector(".cave")?.classList.remove("cave--tunnel");
+const tunnel = document.querySelector(".cave--tunnel");
+document.querySelector(tunnel ? ".cave-screens" : ".cave-holes")?.remove();
+const channelVideos = [...document.querySelectorAll(".tv video, .cave-screen video, .cave-hole video")];
 
 // The room drifts a little with the pointer; the sets in front move more, which reads as depth.
 const caveRoom = document.querySelector(".cave-room");
@@ -87,17 +91,8 @@ Promise.all([
   fetch("/media/reel.json").then((r) => { if (!r.ok) throw new Error(); return r.json(); }),
   fetch("/media/reel.mp4").then((r) => { if (!r.ok) throw new Error(); return r.blob(); }),
 ]).then(([index, blob]) => {
-  const reel = URL.createObjectURL(blob);
-  // Tunnel mode: one copy of the reel plays straight through behind the empty sets.
-  const behind = document.querySelector(".cave--tunnel .cave-behind");
-  if (behind) {
-    behind.src = reel;
-    if (!reducedMotion) behind.play().catch(() => {});
-  }
-  runChannels(reel, index.segments);
+  runChannels(URL.createObjectURL(blob), index.segments);
 }).catch(runClips);
-// ?room=cave shows the photographed room with its own screens instead.
-if (new URLSearchParams(location.search).get("room") === "cave") document.querySelector(".cave")?.classList.remove("cave--tunnel");
 if ("IntersectionObserver" in window) {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(({ isIntersecting, target }) => {
