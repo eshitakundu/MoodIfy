@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+  "name": "moodify",
+  "main": "src/worker.py",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["python_workers"],
+  "assets": {
+    "directory": "./web",
+    "run_worker_first": ["/api/*", "/docs", "/openapi.json"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "moodify",
+      "database_id": "4889f2fd-44bc-4de4-94b8-2edc627b2aeb",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": { "MOODIFY_REQUIRE_MODERATION": "1" },
+  "routes": [{ "pattern": "moodify.eshita.dev", "custom_domain": true }],
+  "observability": { "enabled": true }
+}

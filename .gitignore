@@ -6,3 +6,10 @@ data/
 .pytest_cache/
 *.egg-info/
 work/
+.wrangler/
+python_modules/
+node_modules/
+.dev.vars
+.venv-workers/
+src/vendor/
+pylock.toml
