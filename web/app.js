@@ -410,7 +410,7 @@ shareForm.addEventListener("submit", async (event) => {
     setCassetteSide("front");
   } finally {
     button.disabled = false;
-    button.textContent = "PUT IT ON THE WALL ●";
+    button.textContent = "PUT IT ON THE WALL";
   }
 });
 $("share-another").addEventListener("click", () => {

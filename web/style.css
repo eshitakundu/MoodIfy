@@ -882,3 +882,15 @@ footer .wordmark { font-size: 2.2rem; }
 @media (min-width: 601px) {
   .c3d #share-status { top: 21%; bottom: auto; left: 5.5%; right: 17%; color: #b3412f; font: 600 5.4cqh/1.05 var(--hand); text-align: left; text-shadow: none; }
 }
+/* One line per control, sized to fit the band; swatches sit clear below the tape. */
+@media (min-width: 601px) {
+  .c3d .cassette-back-actions { gap: 2cqh; }
+  .c3d #share .cassette-back-actions button, .c3d #share .f-flip { flex: none; width: auto; white-space: nowrap; padding: 0 2.6cqh; font-size: 4.2cqh; }
+  .c3d #share .f-sign { min-width: 0; }
+  .c3d .tape-stage { margin-bottom: 44px; }
+  .c3d .tape-colors { bottom: -40px; }
+}
+
+/* A dimming layer over the wall (under the front set), darkest at the edges, so the front TV leads. */
+.cave--tunnel .cave-room::before { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  background: radial-gradient(ellipse 46% 58% at 50% 66%, rgba(0,0,0,.18), rgba(0,0,0,.5) 70%, rgba(0,0,0,.72) 100%); }
