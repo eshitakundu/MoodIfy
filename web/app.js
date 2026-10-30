@@ -266,7 +266,48 @@ $("flip-cassette").addEventListener("click", () => {
 });
 $("back-to-details").addEventListener("click", () => setCassetteSide("front"));
 
+// The community rack: each shared song is a cassette spine in its sender's shell colour.
+const SHELL = { smoke: "#3a414b", clear: "#d9e1ea", black: "#15161a", mint: "#7fd8b4", lilac: "#b4a0ea", sky: "#84c4f2", amber: "#f0ae4a", rose: "#f09cb4" };
+let openTape = null;
 function makeWallNote(capsule) {
+  const tape = document.createElement("button");
+  tape.type = "button";
+  tape.className = "spine";
+  tape.setAttribute("role", "listitem");
+  tape.style.setProperty("--shell", SHELL[capsule.color] || SHELL.smoke);
+  tape.style.setProperty("--tilt", `${(capsule.id * 37 % 7) - 3}deg`);
+  const title = capsule.title || capsule.song;
+  const label = document.createElement("span");
+  label.className = "spine-label";
+  label.textContent = title;
+  const by = document.createElement("span");
+  by.className = "spine-by";
+  by.textContent = capsule.author;
+  tape.append(label, by);
+  tape.setAttribute("aria-label", `${title}, shared by ${capsule.author}. Open the note.`);
+  tape.addEventListener("click", () => {
+    if (openTape) openTape.classList.remove("is-out");
+    if (openTape === tape) { openTape = null; $("rack-reader").classList.add("hidden"); return; }
+    openTape = tape;
+    tape.classList.add("is-out");
+    $("rr-mood").textContent = (capsule.mood || "").toUpperCase();
+    $("rr-ch").textContent = `CH ${String(capsule.id).padStart(3, "0")}`;
+    $("rr-note").textContent = capsule.note;
+    const showArtist = capsule.artist && !title.toLowerCase().includes(capsule.artist.toLowerCase());
+    $("rr-song").href = capsule.listen_url;
+    $("rr-song").textContent = `▶ ${title}${showArtist ? ` — ${capsule.artist}` : ""} ↗`;
+    $("rr-meta").textContent = [capsule.site && `on ${capsule.site}`, `— ${capsule.author}`].filter(Boolean).join(" · ");
+    $("rack-reader").style.setProperty("--shell", SHELL[capsule.color] || SHELL.smoke);
+    $("rack-reader").classList.remove("hidden");
+  });
+  return tape;
+}
+document.querySelector(".rack-close")?.addEventListener("click", () => {
+  openTape?.classList.remove("is-out");
+  openTape = null;
+  $("rack-reader").classList.add("hidden");
+});
+function makeWallNoteOld(capsule) {
   const article = document.createElement("article");
   article.className = "wall-note tv";
   const head = document.createElement("span");

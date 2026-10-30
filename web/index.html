@@ -251,11 +251,18 @@
       </div>
       <section id="community-wall" class="community-wall hidden" aria-labelledby="wall-title">
         <header>
-          <p>ON AIR · COMMUNITY ARCHIVE</p>
-          <h2 id="wall-title">NOTES LEFT ON THE AIR.</h2>
+          <p>THE COMMUNITY RACK</p>
+          <h2 id="wall-title">EVERY TAPE HOLDS A FEELING.</h2>
           <p id="wall-status" role="status"></p>
         </header>
-        <div id="wall-notes" class="wall-notes"></div>
+        <div id="wall-notes" class="rack" role="list"></div>
+        <div id="rack-reader" class="rack-reader hidden" role="dialog" aria-modal="false" aria-label="Cassette note">
+          <button type="button" class="rack-close" aria-label="Put it back">✕</button>
+          <p class="rr-head"><span id="rr-mood"></span><span id="rr-ch"></span></p>
+          <blockquote id="rr-note"></blockquote>
+          <a id="rr-song" target="_blank" rel="noopener noreferrer"></a>
+          <p id="rr-meta"></p>
+        </div>
         <div class="wall-controls">
           <button type="button" id="wall-more" class="hidden">OLDER NOTES ↓</button>
           <button type="button" id="share-another">RECORD ANOTHER ↻</button>

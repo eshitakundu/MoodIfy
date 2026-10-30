@@ -751,3 +751,28 @@ footer .wordmark { font-size: 2.2rem; }
 .tv-result-actions a, .tv-result-actions button { color: #fff; border-color: rgba(240,244,250,.45); }
 .tv-result-actions #another { color: #04121a; background: var(--accent); border-color: var(--accent); text-shadow: none; }
 .tv-result-actions a:hover, .tv-result-actions button:hover { color: #04121a; background: #fff; border-color: #fff; }
+
+/* ---------- the community rack ----------
+   Shared songs stand in a shelf as cassette spines in their sender's shell colour; pull one to read it. */
+.rack { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0 3px; padding: 26px 18px 0; min-height: 210px;
+  background: linear-gradient(180deg, transparent calc(100% - 14px), #2a1d15 calc(100% - 14px), #120c08), linear-gradient(180deg, #0c0d10, #15161b);
+  border: 1px solid #23252b; border-radius: 6px; box-shadow: inset 0 18px 30px rgba(0,0,0,.6); }
+.spine { position: relative; display: flex; flex-direction: column; justify-content: space-between; width: 36px; height: 168px; margin: 0 0 14px; padding: 8px 4px;
+  color: #1b1d22; background: linear-gradient(90deg, rgba(255,255,255,.25), transparent 30%, rgba(0,0,0,.25)), var(--shell);
+  border: 0; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 6px 10px rgba(0,0,0,.55); transform: rotate(var(--tilt)); transform-origin: bottom center;
+  cursor: pointer; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+.spine:hover, .spine:focus-visible { transform: translateY(-10px) rotate(0); }
+.spine.is-out { transform: translateY(-34px) rotate(0); box-shadow: 0 0 0 2px #6fe6ff, 0 14px 24px rgba(0,0,0,.6); }
+.spine-label { flex: 1; margin: 0 0 6px; padding: 6px 2px; overflow: hidden; background: #ebe4d3; border-radius: 2px; writing-mode: vertical-rl; transform: rotate(180deg); font: 600 1rem/1 var(--hand); white-space: nowrap; text-overflow: ellipsis; }
+.spine-by { overflow: hidden; color: rgba(0,0,0,.6); writing-mode: vertical-rl; transform: rotate(180deg); font: 500 .58rem var(--mono); white-space: nowrap; text-overflow: ellipsis; max-height: 52px; }
+.rack-reader { position: relative; margin: 16px auto 0; max-width: 640px; padding: 18px 22px; color: #1b1d22; background: #ebe4d3; border-radius: 6px;
+  box-shadow: inset 0 -14px 0 #1b1d22, 0 0 0 6px var(--shell), 0 14px 30px rgba(0,0,0,.6); }
+.rack-reader .rr-head { display: flex; justify-content: space-between; margin: 0 0 8px; color: #5a5f69; font: 600 .7rem var(--mono); letter-spacing: .14em; }
+.rack-reader blockquote { margin: 0 0 12px; padding: 0; border: 0; font: 600 1.6rem/1.1 var(--hand); }
+.rack-reader a { color: #2f6f8f; font: 600 .78rem var(--mono); text-decoration: none; }
+.rack-reader a:hover { text-decoration: underline; }
+.rack-reader #rr-meta { margin: 6px 0 18px; color: #5a5f69; font: 600 1.05rem var(--hand); }
+.rack-close { position: absolute; top: 8px; right: 10px; padding: 2px 8px; color: #1b1d22; background: transparent; border: 1px solid #9a948a; border-radius: 4px; }
+.community-wall .wall-empty { width: 100%; background: transparent; border: 0; }
+.rack-reader .rr-head { padding-right: 40px; }
+.community-wall header p:first-child::before { background: #6fe6ff; box-shadow: 0 0 8px rgba(111,230,255,.6); }

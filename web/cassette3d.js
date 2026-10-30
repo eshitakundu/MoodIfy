@@ -100,19 +100,33 @@ for (const [x, radius] of [[-2.15, 1.55], [2.15, 1.05]]) {
   const reel = new THREE.Group();
   const pack = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, 0.42, 48), packMaterial);
   pack.rotation.x = Math.PI / 2;
-  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.58, 0.58, 0.5, 32), hubMaterial);
+  // translucent flanges either side of the pack, a white hub ring with six spokes and teeth
+  const flange = new THREE.MeshPhysicalMaterial({ color: 0xe8edf2, roughness: 0.15, transmission: 0.85, thickness: 0.05, transparent: true });
+  for (const z of [-0.24, 0.24]) {
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(1.7, 1.7, 0.03, 64), flange);
+    disc.rotation.x = Math.PI / 2;
+    disc.position.z = z;
+    reel.add(disc);
+  }
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.09, 12, 40), hubMaterial);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.5, 32), hubMaterial);
   hub.rotation.x = Math.PI / 2;
-  const hole = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.52, 24), darkMaterial);
+  const hole = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.52, 24), darkMaterial);
   hole.rotation.x = Math.PI / 2;
-  reel.add(pack, hub, hole);
+  reel.add(pack, ring, hub, hole);
   for (let i = 0; i < 6; i++) {
-    const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.5), hubMaterial);
     const angle = (i / 6) * Math.PI * 2;
-    tooth.position.set(Math.cos(angle) * 0.3, Math.sin(angle) * 0.3, 0);
-    tooth.rotation.z = angle;
-    reel.add(tooth);
+    const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.1, 0.3), hubMaterial);
+    spoke.position.set(Math.cos(angle) * 0.47, Math.sin(angle) * 0.47, 0);
+    spoke.rotation.z = angle;
+    const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.14, 0.5), hubMaterial);
+    tooth.position.set(Math.cos(angle + 0.5) * 0.22, Math.sin(angle + 0.5) * 0.22, 0);
+    tooth.rotation.z = angle + 0.5;
+    reel.add(spoke, tooth);
   }
   reel.position.set(x, LABEL_Y, 0);
+  reel.userData.pack = pack;
+  reel.userData.radius = radius;
   tape.add(reel);
   reels.push(reel);
 }
@@ -145,6 +159,23 @@ for (const [x, y] of [[-4.55, 2.8], [4.55, 2.8], [-4.55, -2.8], [4.55, -2.8], [0
   tape.add(post);
 }
 
+// Moulded details: grip ribs down both short edges and the write-protect tabs on the top edge.
+const rib = new THREE.MeshStandardMaterial({ color: 0x0f1013, roughness: 0.45, transparent: true, opacity: 0.55 });
+for (const z of [D / 2 + 0.06, -D / 2 - 0.06]) {
+  for (const sx of [-1, 1]) {
+    for (let i = 0; i < 6; i++) {
+      const line = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.05, 0.02), rib);
+      line.position.set(sx * 4.72, -1.3 + i * 0.28, z);
+      tape.add(line);
+    }
+  }
+}
+for (const x of [-3.9, 3.9]) {
+  const notch = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.22, D * 0.7), darkMaterial);
+  notch.position.set(x, H / 2 - 0.08, 0);
+  tape.add(notch);
+}
+
 // Screws at the corners and bottom centre, on both faces.
 const screwMaterial = new THREE.MeshStandardMaterial({ color: 0x9aa1aa, roughness: 0.35, metalness: 0.9 });
 for (const z of [D / 2 + 0.09, -D / 2 - 0.09]) {
@@ -162,8 +193,22 @@ await Promise.race([
   Promise.all(["600 58px Caveat", "64px VT323", "30px 'IBM Plex Mono'"].map((font) => document.fonts.load(font))),
   new Promise((resolve) => setTimeout(resolve, 2500)),
 ]);
-function labelTexture(side) {
-  const c = document.createElement("canvas");
+function wrap(g, text, x, y, width, lineHeight, maxLines) {
+  const words = text.split(/\s+/).filter(Boolean);
+  let line = "", lines = 0;
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word;
+    if (g.measureText(test).width > width && line) {
+      g.fillText(lines === maxLines - 1 ? `${line}…` : line, x, y + lines * lineHeight);
+      if (++lines >= maxLines) return;
+      line = word;
+    } else line = test;
+  }
+  if (line) g.fillText(line, x, y + lines * lineHeight);
+}
+const ink = { A: "", B: "", name: "" };
+function labelTexture(side, existing) {
+  const c = existing?.image || document.createElement("canvas");
   c.width = 1024; c.height = Math.round(1024 * LABEL_H / LABEL_W);
   const g = c.getContext("2d");
   g.fillStyle = "#ebe4d3"; g.fillRect(0, 0, c.width, c.height);
@@ -174,7 +219,13 @@ function labelTexture(side) {
   [["#c9533f", 12], ["#e4a43b", 12], ["#2f6f8f", 12]].forEach(([color, h], i) => { g.fillStyle = color; g.fillRect(0, c.height - 128 + i * 15, c.width, h); });
   g.fillStyle = "#1b1d22"; g.fillRect(0, c.height - 70, c.width, 22);
   g.font = "600 58px 'Caveat', cursive"; g.fillStyle = "#24262b";
-  g.fillText(side === "A" ? "a song for you" : "what it holds", 60, 92);
+  if (side === "A") {
+    g.fillText(ink.A ? ink.A.replace(/^https?:\/\/(www\.)?/, "").slice(0, 34) : "a song for you", 60, 92);
+  } else if (ink.B) {
+    g.font = "600 40px 'Caveat', cursive";
+    wrap(g, ink.B, 60, 78, c.width - 200, 30, 2);
+  } else g.fillText("what it holds", 60, 92);
+  if (side === "B" && ink.name) { g.font = "600 40px 'Caveat', cursive"; g.fillStyle = "#2f6f8f"; g.fillText(`— ${ink.name}`.slice(0, 30), c.width - 420, c.height * 0.33); g.fillStyle = "#24262b"; }
   g.font = "700 64px 'VT323', monospace"; g.fillText(side, c.width - 92, 96);
   g.font = "400 30px 'IBM Plex Mono', monospace"; g.fillStyle = "#3d4048";
   g.fillText("MOODiFY · COMMUNITY RECORDING", 60, c.height - 92);
@@ -184,6 +235,7 @@ function labelTexture(side) {
   g.beginPath(); g.roundRect(wx, wy, ww, wh, 26); g.fill();
   g.globalCompositeOperation = "source-over";
   g.strokeStyle = "#1b1d22"; g.lineWidth = 6; g.beginPath(); g.roundRect(wx, wy, ww, wh, 26); g.stroke();
+  if (existing) { existing.needsUpdate = true; return existing; }
   const texture = new THREE.CanvasTexture(c);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
@@ -198,6 +250,18 @@ for (const side of ["A", "B"]) {
   tape.add(label);
   labels[side] = label;
 }
+// Whatever you type is handwritten onto the label as you go.
+form.addEventListener("input", () => {
+  ink.A = form.elements.url.value.trim();
+  ink.B = form.elements.message.value.trim();
+  ink.name = form.elements.name.value.trim();
+  for (const side of ["A", "B"]) labelTexture(side, labels[side].material.map);
+  // the take-up reel fills as the message grows
+  const share = Math.min(ink.B.length / 400, 1);
+  reels[0].userData.pack.scale.set(1 - share * 0.3, 1, 1 - share * 0.3);
+  reels[1].userData.pack.scale.set(1 + share * 0.45, 1, 1 + share * 0.45);
+});
+form.addEventListener("reset", () => setTimeout(() => form.dispatchEvent(new Event("input")), 0));
 
 function setColor(name) {
   const choice = COLORS[name] || COLORS.smoke;
