@@ -824,3 +824,19 @@ footer .wordmark { font-size: 2.2rem; }
 .c3d .tape-stage { height: 420px; }
 .c3d .tape-stage > canvas { top: -140px; height: calc(100% - 96px + 280px); }
 .c3d .tape-hint { bottom: 52px; }
+
+/* Controls live in the label's white band under the stripes, printed like the rest of the label. */
+@media (min-width: 601px) {
+  .c3d #share .f-flip, .c3d .cassette-back-actions { top: auto; bottom: 4%; height: 14cqh; }
+  .c3d .cassette-back-actions { left: 5.5%; right: 5.5%; gap: 2.4cqh; }
+  .c3d #share .f-flip { left: 0; right: 0; }
+  .c3d #share button { height: 100%; padding: 0 3cqh; color: #24262b; background: transparent; border: 1px solid rgba(36,38,43,.45); border-radius: 999px; font: 600 4.6cqh/1 var(--mono); letter-spacing: .08em; }
+  .c3d #share button[type=submit], .c3d #share .f-flip { color: #fff; background: #2f7fd6; border-color: #2f7fd6; }
+  .c3d #share button:hover { color: #fff; background: #24262b; border-color: #24262b; }
+  .c3d #share .f-sign { flex: 1 1 auto; height: 100%; gap: 1.6cqh; }
+  .c3d #share.cassette-form .f-sign span { color: #5a5f69; font: 600 3.6cqh var(--mono); letter-spacing: .1em; }
+  .c3d #share.cassette-form .f-sign input { height: 100%; padding: 0; color: #24262b; background: transparent; border: 0; border-bottom: 1px dashed rgba(36,38,43,.45); border-radius: 0; font: 600 7.4cqh/1 var(--hand); }
+  .c3d #share.cassette-form .f-sign input::placeholder { color: rgba(36,38,43,.4); }
+  .c3d #share-status { top: auto; bottom: -34px; }
+}
+@media (min-width: 601px) { .c3d #share button { flex: none; white-space: nowrap; } }

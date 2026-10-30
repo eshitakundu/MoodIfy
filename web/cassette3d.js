@@ -217,8 +217,8 @@ function labelTexture(side, existing) {
   for (let i = 0; i < 900; i++) g.fillRect(Math.random() * c.width, Math.random() * c.height, 2, 2);
   g.strokeStyle = "rgba(40,44,52,.18)"; g.lineWidth = 2;
   for (let y = 132; y < c.height * 0.34; y += 30) { g.beginPath(); g.moveTo(60, y); g.lineTo(c.width - 60, y); g.stroke(); }
-  [["#c9533f", 12], ["#e4a43b", 12], ["#2f6f8f", 12]].forEach(([color, h], i) => { g.fillStyle = color; g.fillRect(0, c.height - 128 + i * 15, c.width, h); });
-  g.fillStyle = "#1b1d22"; g.fillRect(0, c.height - 70, c.width, 22);
+  [["#c9533f", 12], ["#e4a43b", 12], ["#2f6f8f", 12]].forEach(([color, h], i) => { g.fillStyle = color; g.fillRect(0, c.height * 0.645 + i * 15, c.width, h); });
+  g.fillStyle = "#1b1d22"; g.fillRect(0, c.height * 0.74, c.width, 14);
   g.font = "600 58px 'Caveat', cursive"; g.fillStyle = "#24262b";
   if (writing) {
     // blank lines for the inputs on top
@@ -231,9 +231,9 @@ function labelTexture(side, existing) {
   if (!writing && side === "B" && ink.name) { g.font = "600 40px 'Caveat', cursive"; g.fillStyle = "#2f6f8f"; g.fillText(`— ${ink.name}`.slice(0, 30), c.width - 420, c.height * 0.33); g.fillStyle = "#24262b"; }
   g.font = "700 64px 'VT323', monospace"; g.fillText(side, c.width - 92, 96);
   g.font = "400 30px 'IBM Plex Mono', monospace"; g.fillStyle = "#3d4048";
-  g.fillText("MOODiFY · COMMUNITY RECORDING", 60, c.height - 92);
+  g.fillText("MOODiFY · COMMUNITY RECORDING", 60, c.height * 0.625);
   // the window over the reels
-  const wx = c.width * 0.17, wy = c.height * 0.36, ww = c.width * 0.66, wh = c.height * 0.36;
+  const wx = c.width * 0.17, wy = c.height * 0.33, ww = c.width * 0.66, wh = c.height * 0.24;
   g.globalCompositeOperation = "destination-out";
   g.beginPath(); g.roundRect(wx, wy, ww, wh, 26); g.fill();
   g.globalCompositeOperation = "source-over";
