@@ -840,3 +840,45 @@ footer .wordmark { font-size: 2.2rem; }
   .c3d #share-status { top: auto; bottom: -34px; }
 }
 @media (min-width: 601px) { .c3d #share button { flex: none; white-space: nowrap; } }
+
+/* ---------- the rack, in the room's language ----------
+   No panel: cassettes stand face-out on a lit shelf in the dark, each in its sender's shell colour, and
+   the note opens on a CRT screen edged in that colour. */
+.community-wall { padding: 0; background: none; border: 0; box-shadow: none; }
+.community-wall header { display: block; margin: 0 4% 18px; padding: 0; background: none; border: 0; box-shadow: none; }
+.community-wall header p:first-child { color: #b3aa98; font-size: .7rem; letter-spacing: .12em; }
+.community-wall header p:first-child::before { content: none; }
+.community-wall header h2 { margin: 6px 0 8px; color: var(--paper); font: 400 clamp(3rem, 7vw, 5.6rem)/.86 var(--display); }
+#wall-status { max-width: none; margin: 0; padding: 0; color: #7fb6f0; background: none; border: 0; box-shadow: none; font: 600 .8rem var(--mono); text-shadow: none; }
+.rack { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 34px 22px; min-height: 0; padding: 30px 4% 46px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(47,127,214,.14), transparent 60%); border: 0; border-radius: 0; box-shadow: none; }
+.rack::after { content: ""; position: absolute; left: 2%; right: 2%; bottom: 18px; height: 10px; border-radius: 2px;
+  background: linear-gradient(180deg, #4a3222, #1c120c); box-shadow: 0 -1px 0 rgba(255,190,130,.35), 0 18px 30px rgba(0,0,0,.8), 0 -30px 60px rgba(47,127,214,.08); }
+.spine { position: relative; width: 100%; height: auto; aspect-ratio: 100 / 63; margin: 0; padding: 8% 7% 10%; flex-direction: column; color: #24262b;
+  background: linear-gradient(160deg, rgba(255,255,255,.45), rgba(255,255,255,.06) 30%, rgba(0,0,0,.18) 75%), var(--shell);
+  border: 0; border-radius: 7px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3), inset 0 -6px 12px rgba(0,0,0,.25), 0 14px 22px rgba(0,0,0,.6), 0 0 0 transparent;
+  transform: rotate(var(--tilt)); transform-origin: 50% 100%; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+.spine::after { content: ""; position: absolute; left: 30%; right: 30%; bottom: 0; height: 9%; border-radius: 4px 4px 0 0; background: rgba(0,0,0,.28); }
+.spine:hover, .spine:focus-visible { transform: translateY(-8px) rotate(0); box-shadow: inset 0 0 0 1px rgba(255,255,255,.4), 0 18px 28px rgba(0,0,0,.65), 0 0 26px color-mix(in srgb, var(--shell) 55%, transparent); }
+.spine.is-out { transform: translateY(-14px) rotate(0) scale(1.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.5), 0 20px 30px rgba(0,0,0,.7), 0 0 34px color-mix(in srgb, var(--shell) 75%, transparent); }
+.spine-label { display: flex; flex-direction: column; width: 100%; height: 100%; margin: 0; padding: 6% 8%; overflow: hidden; background: #ebe4d3; border-radius: 3px;
+  writing-mode: horizontal-tb; transform: none; box-shadow: inset 0 -5px 0 #1b1d22; }
+.spine-title { overflow: hidden; font: 600 1.05rem/1.05 var(--hand); text-align: left; white-space: nowrap; text-overflow: ellipsis; }
+.spine-reels { display: flex; justify-content: space-around; align-items: center; flex: 1; margin: 6% 8% 4%; background: #101114; border-radius: 99px; }
+.spine-reels i { width: 22%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #101114 0 26%, #ece6da 28% 40%, color-mix(in srgb, var(--shell) 60%, #2a1c16) 42%); }
+.spine-by { max-height: none; overflow: hidden; color: #5a5f69; font: 600 .82rem/1 var(--hand); text-align: right; white-space: nowrap; text-overflow: ellipsis; writing-mode: horizontal-tb; transform: none; }
+.rack-reader { max-width: 680px; margin: 6px auto 0; padding: 22px 26px 18px; color: #fff;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px), radial-gradient(ellipse at 50% 40%, #121a26, #05070b 85%);
+  border-radius: 18px / 22px; box-shadow: inset 0 0 40px rgba(0,0,0,.8), 0 0 0 3px #0b0c0f, 0 0 0 5px var(--shell), 0 0 40px color-mix(in srgb, var(--shell) 40%, transparent); }
+.rack-reader .rr-head { color: #7fb6f0; }
+.rack-reader blockquote { color: #fff; text-shadow: 0 0 2px #000, 0 0 10px rgba(200,220,255,.3); }
+.rack-reader a { color: #fff; border-bottom: 1px solid rgba(255,255,255,.35); }
+.rack-reader #rr-meta { color: #c9d2e2; }
+.rack-close { color: #fff; border-color: rgba(255,255,255,.35); }
+.wall-controls button { color: #fff; background: transparent; border: 1px solid rgba(240,244,250,.45); border-radius: 999px; box-shadow: none; }
+#share-another { color: #fff; background: #2f7fd6; border-color: #2f7fd6; text-shadow: none; }
+@media (max-width: 600px) { .rack { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; } }
+/* Hints and errors are pencilled on the label's second ruled line, right under what you wrote. */
+@media (min-width: 601px) {
+  .c3d #share-status { top: 21%; bottom: auto; left: 5.5%; right: 17%; color: #b3412f; font: 600 5.4cqh/1.05 var(--hand); text-align: left; text-shadow: none; }
+}

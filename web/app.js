@@ -279,11 +279,17 @@ function makeWallNote(capsule) {
   const title = capsule.title || capsule.song;
   const label = document.createElement("span");
   label.className = "spine-label";
-  label.textContent = title;
+  const name = document.createElement("span");
+  name.className = "spine-title";
+  name.textContent = title;
+  const reels = document.createElement("span");
+  reels.className = "spine-reels";
+  reels.append(document.createElement("i"), document.createElement("i"));
   const by = document.createElement("span");
   by.className = "spine-by";
-  by.textContent = capsule.author;
-  tape.append(label, by);
+  by.textContent = `— ${capsule.author}`;
+  label.append(name, reels, by);
+  tape.append(label);
   tape.setAttribute("aria-label", `${title}, shared by ${capsule.author}. Open the note.`);
   tape.addEventListener("click", () => {
     if (openTape) openTape.classList.remove("is-out");
