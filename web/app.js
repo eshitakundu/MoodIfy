@@ -63,6 +63,12 @@ function runChannels(src, segments) {
     };
     video.addEventListener("loadedmetadata", () => { cut(); if (shouldPlay(video)) video.play().catch(() => {}); }, { once: true });
     video.addEventListener("pause", () => { if (shouldPlay(video)) video.play().catch(() => {}); });
+    // A set that runs past the end of its scene would spill into the next scene in the reel, which
+    // another set may be showing, so it cuts to a free scene first.
+    video.addEventListener("timeupdate", () => {
+      const seg = segments[onAir.get(video)];
+      if (seg && (video.currentTime < seg.start || video.currentTime > seg.start + seg.duration - 0.25)) cut();
+    });
     video.src = src;
     if (reducedMotion) return;
     const flip = () => {
@@ -114,7 +120,7 @@ function setListenLinks(capsule) {
   const query = encodeURIComponent(`${capsule.title || capsule.song} ${capsule.artist || ""}`.trim());
   const shared = Boolean(capsule.url);
   $("listen-youtube").href = capsule.listen_url || `https://www.youtube.com/results?search_query=${query}`;
-  $("listen-youtube").textContent = shared ? `OPEN ON ${capsule.site.toUpperCase()} ↗` : "LISTEN ON YOUTUBE ↗";
+  $("listen-youtube").textContent = shared ? `▶ ${capsule.site.toUpperCase()} ↗` : "▶ YOUTUBE ↗";
   $("listen-spotify").href = `https://open.spotify.com/search/${query}`;
   $("listen-spotify").classList.toggle("hidden", shared);
 }
@@ -128,17 +134,24 @@ function showCapsule(capsule, reading, support) {
   $("artist").textContent = capsule.artist || capsule.site || "Community transmission";
   $("note").textContent = capsule.note;
   $("author").textContent = `Shared by ${capsule.author}`;
-  document.querySelector(".result-art").style.setProperty("--mood-color", MOOD_COLORS[capsule.mood] || "#5c5043");
+  $("result").style.setProperty("--mood-color", MOOD_COLORS[capsule.mood] || "#5c5043");
   setListenLinks(capsule);
   const disc = document.querySelector(".disc");
   disc.classList.remove("drop");
   void disc.offsetWidth;
   disc.classList.add("drop");
+  // The answer plays on the same set: the input fades out and the song takes the screen.
   const result = $("result");
+  $("tune-in").classList.add("hidden");
   result.classList.remove("hidden");
-  result.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  result.closest(".tv").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
   result.focus({ preventScroll: true });
 }
+$("back-to-input").addEventListener("click", () => {
+  $("result").classList.add("hidden");
+  $("tune-in").classList.remove("hidden");
+  $("feeling").focus();
+});
 function setBusy(isBusy) {
   document.querySelectorAll("[data-mode], #random-channel, #another").forEach((button) => { button.disabled = isBusy; });
 }
@@ -223,7 +236,7 @@ $("copy-capsule").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(text);
     $("copy-capsule").textContent = "COPIED ✓";
-    setTimeout(() => { $("copy-capsule").textContent = "COPY THIS SONG"; }, 1800);
+    setTimeout(() => { $("copy-capsule").textContent = "COPY"; }, 1800);
   } catch { $("copy-capsule").textContent = "COPY NOT AVAILABLE"; }
 });
 
