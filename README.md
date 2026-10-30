@@ -6,9 +6,9 @@
 
 Live at **[moodify.eshita.dev](https://moodify.eshita.dev)**
 
-MoodIfy is community music television. People share a song by pasting a link (YouTube, Spotify, SoundCloud or anywhere else), flip the tape and write what the song holds for them. When you describe how you feel, MoodIfy reads your mood and finds the shared song whose note fits your words best. You can ask to *feel understood* (same mood) or to *lift your mood* (a gentler mood one step away).
+MoodIfy is community music television. People share a song by pasting a link (YouTube, Spotify, SoundCloud or anywhere else) and writing what the song holds for them. When you describe how you feel, MoodIfy reads your mood and finds the shared song whose note fits your words best. You can ask to *feel understood* (same mood) or to *lift your mood* (a gentler mood one step away).
 
-![The MoodIfy TV wall: a check-in screen surrounded by sets playing music clips](docs/screenshot.png)
+![The MoodIfy TV wall: a red terminal check-in screen surrounded by sets playing animated pixel-art scenes](docs/screenshot.png)
 
 ## How it works
 
@@ -21,7 +21,7 @@ your text ──► crisis check ──► mood reader ──► target mood ─
           (never sent to a model)
 ```
 
-1. **Mood reader.** An OpenRouter model labels the text with one of nine moods (joyful, sad, anxious, angry, lonely, drained, nostalgic, calm, hopeful). Its answer is checked against that fixed list. No key, a timeout, bad JSON or an unknown label all fall back to an offline keyword reader, so the app always answers.
+1. **Mood reader.** A free OpenRouter model labels the text with one of nine moods (joyful, sad, anxious, angry, lonely, drained, nostalgic, calm, hopeful). Its answer is checked against that fixed list. No key, bad JSON, an unknown label or no answer within 10 seconds all fall back to an offline keyword reader, so the app always answers quickly. Fallbacks are logged with their reason, never with the person's text.
 2. **Retrieval.** Songs are filtered to the target mood, then ranked by TF-IDF cosine similarity between your text and each note. "Can't sleep, mind racing at 2am" finds the note written about 2am anxiety, not just any anxious song. Community songs win ties over starter ones, and you won't see the same one twice until the pool runs out.
 3. **Safety first.** Text that mentions self-harm or suicide is never sent to a model. The response leads with a support message and free helplines (Tele-MANAS 14416 in India, findahelpline.com elsewhere).
 
@@ -29,7 +29,7 @@ your text ──► crisis check ──► mood reader ──► target mood ─
 
 ![Side A of the cassette: paste a song link, then flip the tape](docs/share.png)
 
-Side A takes the link, side B the message and an optional name. The link is checked before anything is saved: https only, no passwords in the URL, no IP addresses or localhost. Known music sites are labelled by name, and anything else shows its domain so people can see where a link goes before clicking it. Titles and artists come from each site's public oEmbed endpoint, so nobody has to type them.
+On desktop, side A of the cassette takes the link and side B the message and an optional name. On phones the flip would be cramped, so both sides become one card.  The link is checked before anything is saved: https only, no passwords in the URL, no IP addresses or localhost. Known music sites are labelled by name, and anything else shows its domain so people can see where a link goes before clicking it. Titles and artists come from each site's public oEmbed endpoint, so nobody has to type them.
 
 Every message then goes through layered moderation before it can reach the public wall:
 
@@ -46,6 +46,12 @@ In production `MOODIFY_REQUIRE_MODERATION=1` holds every message if the model ke
 
 A new community app is empty on day one, so MoodIfy ships with **200 starter songs** across all nine moods: Bollywood and Indian indie, K-pop and J-pop, Latin, Afrobeats, French, Pakistani and Brazilian classics, and indie from Mitski to Men I Trust. Each has a short note on when it helps, and they are labelled "MoodIfy starter set" in the API. They are used for matching but never shown on the community wall.
 
+## The TV wall
+
+The wall plays twenty animated pixel-art scenes, all CC0 art from OpenGameArt. `scripts/render_pixel_reel.py` builds each one from its layers: parallax scrolling, rain, twinkling stars and flickering light, scaled up with crisp pixels and joined into one reel that every screen shares, so cuts never go black. No two sets show the same scene at once, and a scene stays on for 2.5 to 4 seconds so the motion is visible. A ticker under the wall crawls through songs people shared. Phones show only the two working sets. Artist credits are in [web/media/clips/SOURCES.md](web/media/clips/SOURCES.md).
+
+<img src="docs/phone.png" alt="MoodIfy on a phone: the check-in terminal and Random Channel" width="260">
+
 ## Evaluation
 
 `python evals/run_eval.py` scores the mood reader on two labelled sets:
@@ -60,13 +66,13 @@ Read this honestly. I wrote the direct set alongside the keyword list, so 100% t
 ## Tests
 
 60 pytest tests cover:
-- the starter set and the mood reader, including every LLM failure mode falling back correctly (mocked transport)
+- the starter set and the mood reader, including every LLM failure mode and a slow model falling back correctly (mocked transport)
 - retrieval ranking and repeat-skipping
 - crisis handling (asserting the model is never called)
 - link safety (schemes, credentials, IPs) and oEmbed lookups
 - moderation failing closed
 - rate limits, wall pagination and the admin endpoints
-- the upgrade from the original database schema
+- the upgrade from the original database schema, and new starter songs reaching existing databases
 
 ## Run it
 
@@ -114,12 +120,7 @@ Interactive docs at `/docs`. Frontend notes are in [docs/frontend-api.md](docs/f
 - The keyword fallback is weak on indirect language (see the eval). With no API key, expect generic matches for subtle text.
 - One mood per message. Mixed feelings ("happy but scared") get the stronger signal.
 - Moderation is only as good as the model behind it; held messages wait for a person to review them.
-
-## History
-
-Started in March 2025 as a hackathon prototype (Streamlit, MySQL and a UiPath email workflow), which grew out of the capsule idea in [Trackify](https://github.com/eshitakundu/Trackify). Rebuilt in October 2026 as a tested FastAPI service with an LLM mood reader, retrieval and evals, then turned into a community wall with song links, moderation and a TV-wall interface. The earlier commits are still in the history.
-
-The TV wall plays CC0 pixel art from OpenGameArt, animated with parallax, rain and flickering light by `scripts/render_pixel_reel.py`. Artist credits are in [web/media/clips/SOURCES.md](web/media/clips/SOURCES.md).
+- The free model is slow and has a daily request limit. When it is slow or out of requests, matching uses the keyword reader.
 
 ## Stack
 
