@@ -41,7 +41,7 @@ function runChannels(src, segments) {
 
 // Fallback if the reel can't load: the individual clips, one file per cut.
 function runClips() {
-  const clipUrl = (n) => `/static/media/clips/clip-${String(n).padStart(2, "0")}.mp4`;
+  const clipUrl = (n) => `/media/clips/clip-${String(n).padStart(2, "0")}.mp4`;
   const randomClip = () => 1 + Math.floor(Math.random() * 46);
   channelVideos.forEach((video) => {
     video.loop = true;
@@ -55,8 +55,8 @@ function runClips() {
 }
 
 Promise.all([
-  fetch("/static/media/reel.json").then((r) => { if (!r.ok) throw new Error(); return r.json(); }),
-  fetch("/static/media/reel.mp4").then((r) => { if (!r.ok) throw new Error(); return r.blob(); }),
+  fetch("/media/reel.json").then((r) => { if (!r.ok) throw new Error(); return r.json(); }),
+  fetch("/media/reel.mp4").then((r) => { if (!r.ok) throw new Error(); return r.blob(); }),
 ]).then(([index, blob]) => runChannels(URL.createObjectURL(blob), index.segments)).catch(runClips);
 if ("IntersectionObserver" in window) {
   const observer = new IntersectionObserver((entries) => {
