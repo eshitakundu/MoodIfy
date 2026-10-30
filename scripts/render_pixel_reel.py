@@ -54,6 +54,28 @@ class Scene:
 
 
 L = Layer
+
+
+def skyline(name: str, *, atmosphere: int, cloud: int | None, back: int, front: int, water: int,
+            stars: bool = False) -> Scene:
+    """FabinhoSC's skyline ships four colour versions built from the same layers."""
+    part = lambda kind, n: f"Background_City_Skyline/Layers/Background_City_Skyline_{kind}_{n:02d}.png"
+    layers = [L(part("Atmosfere", atmosphere), 0, "fill")]
+    if stars:
+        layers.append(L(part("Stars", 1), 1, "fill"))
+    if cloud:
+        layers.append(L(part("Cloud", cloud), 3, "fill"))
+    layers += [L(part("Back", back), 6, "fill"), L(part("Front", front), 12, "fill"), L(part("Water", water), 12, "fill")]
+    return Scene(name, "skyline-background", layers, height=170, stars=30 if stars else 0)
+
+
+def ocean(name: str, time: str, stars: int = 0) -> Scene:
+    """ansimuz's Ocean View comes in day, noon and night versions."""
+    folder = f"Ocean View Files/Layers/{time}"
+    return Scene(name, "warped-ocean-view", [L(f"{folder}/Back.png", 2, "fill"), L(f"{folder}/Clouds.png", 6, "fill"),
+                                             L(f"{folder}/Middle.png", 12, "fill")], height=240, stars=stars)
+
+
 SCENES = [
     Scene("future-alley", "future-city-27", [L("future_city_27.png", 0, "top", tile=False)],
           height=160, pan=1, rain=70, flicker=0.06),
@@ -65,15 +87,14 @@ SCENES = [
         L("cyberpunk city 2 files/Environment/background/back.png", 2, "fill"),
         L("cyberpunk city 2 files/Environment/background/middle.png", 7, "fill"),
         L("cyberpunk city 2 files/Environment/background/front.png", 16, "fill")], height=160, rain=55, flicker=0.05),
-    Scene("dusk-skyline", "skyline-background", [
-        L("Background_City_Skyline/Layers/Background_City_Skyline_Atmosfere_02.png", 0, "fill"),
-        L("Background_City_Skyline/Layers/Background_City_Skyline_Cloud_02.png", 3, "fill"),
-        L("Background_City_Skyline/Layers/Background_City_Skyline_Back_02.png", 6, "fill"),
-        L("Background_City_Skyline/Layers/Background_City_Skyline_Front_02.png", 12, "fill")], height=170),
-    Scene("night-ocean", "warped-ocean-view", [
-        L("Ocean View Files/Layers/Night/Back.png", 2, "fill"),
-        L("Ocean View Files/Layers/Night/Clouds.png", 6, "fill"),
-        L("Ocean View Files/Layers/Night/Middle.png", 12, "fill")], height=240, stars=50),
+    # The pack's layer numbers don't follow its colour versions, so each set is picked by eye.
+    skyline("dusk-skyline", atmosphere=2, cloud=2, back=2, front=2, water=4),
+    skyline("magenta-skyline", atmosphere=4, cloud=None, back=4, front=2, water=1),
+    skyline("starry-skyline", atmosphere=3, cloud=1, back=1, front=1, water=3, stars=True),
+    skyline("aurora-skyline", atmosphere=3, cloud=3, back=3, front=1, water=2, stars=True),
+    ocean("night-ocean", "Night", stars=50),
+    ocean("day-ocean", "Day"),
+    ocean("noon-ocean", "Noon"),
     Scene("miami-drive", "warped-miami-synth", [
         L("Miami-synth-files/Layers/back.png", 0, "fill"), L("Miami-synth-files/Layers/sun.png", 0, "fill"),
         L("Miami-synth-files/Layers/buildings.png", 8, "fill"), L("Miami-synth-files/Layers/palms.png", 18, "fill"),

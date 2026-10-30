@@ -18,15 +18,26 @@ setInterval(updateClock, 1000);
 // every TV. A cut is a jump inside the reel, so screens never go black while a new file loads.
 const channelVideos = [...document.querySelectorAll(".tv video")];
 const shouldPlay = (video) => !reducedMotion && video.dataset.visible !== "false" && !document.hidden;
-const cutInterval = () => 700 + Math.random() * 700;
-const CLIP_COUNT = 15;  // media/clips/clip-01.mp4 … clip-15.mp4, made by scripts/render_pixel_reel.py
+// Slow enough to see the rain and drifting layers before the channel changes.
+const cutInterval = () => 2500 + Math.random() * 1500;
+const CLIP_COUNT = 20;  // media/clips/clip-01.mp4 … clip-20.mp4, made by scripts/render_pixel_reel.py
+// Which scene each set is showing, so no two sets show the same one at once.
+const onAir = new Map();
+const pickScene = (video, count) => {
+  const busy = new Set([...onAir].filter(([other]) => other !== video).map(([, scene]) => scene));
+  const free = [...Array(count).keys()].filter((scene) => !busy.has(scene));
+  const pool = free.length ? free : [...Array(count).keys()];
+  const scene = pool[Math.floor(Math.random() * pool.length)];
+  onAir.set(video, scene);
+  return scene;
+};
 
 function runChannels(src, segments) {
   channelVideos.forEach((video) => {
     video.loop = true;
     const cut = () => {
-      const seg = segments[Math.floor(Math.random() * segments.length)];
-      video.currentTime = seg.start + Math.random() * Math.max(0, seg.duration - 0.9);
+      const seg = segments[pickScene(video, segments.length)];
+      video.currentTime = seg.start + Math.random() * Math.max(0, seg.duration - 4.1);  // room for the longest cut
     };
     video.addEventListener("loadedmetadata", () => { cut(); if (shouldPlay(video)) video.play().catch(() => {}); }, { once: true });
     video.addEventListener("pause", () => { if (shouldPlay(video)) video.play().catch(() => {}); });
@@ -43,10 +54,9 @@ function runChannels(src, segments) {
 // Fallback if the reel can't load: the individual clips, one file per cut.
 function runClips() {
   const clipUrl = (n) => `/media/clips/clip-${String(n).padStart(2, "0")}.mp4`;
-  const randomClip = () => 1 + Math.floor(Math.random() * CLIP_COUNT);
   channelVideos.forEach((video) => {
     video.loop = true;
-    const tune = () => { video.src = clipUrl(randomClip()); if (shouldPlay(video)) video.play().catch(() => {}); };
+    const tune = () => { video.src = clipUrl(1 + pickScene(video, CLIP_COUNT)); if (shouldPlay(video)) video.play().catch(() => {}); };
     video.addEventListener("error", tune);
     tune();
     if (reducedMotion) return;
