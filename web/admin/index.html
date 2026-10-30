@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>MoodIfy · review desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=IBM+Plex+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
+  <link rel="icon" href="/media/moodify-signal-i.svg" type="image/svg+xml">
+  <style>
+    :root { --red: #e5483b; --paper: #efe8d6; --muted: #a9a29a; --bg: #0b0807; --panel: #15100e; --line: #3a2a26;
+      --term: "VT323", "IBM Plex Mono", monospace; --mono: "IBM Plex Mono", monospace; --hand: "Caveat", cursive; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: var(--paper); background: var(--bg); font: 14px/1.5 var(--mono); }
+    main { width: min(900px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 60px; }
+    h1 { margin: 0 0 4px; color: var(--red); font: 2.6rem/1 var(--term); letter-spacing: .04em; text-shadow: 0 0 8px rgba(229,72,59,.6); }
+    .sub { margin: 0 0 22px; color: var(--muted); }
+    button, input { font: inherit; }
+    button { cursor: pointer; padding: 7px 14px; color: var(--paper); background: transparent; border: 1px solid var(--line); border-radius: 4px; }
+    button:hover { border-color: var(--red); }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+    .login { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+    .login input { flex: 1 1 260px; padding: 8px 10px; color: var(--paper); background: #0b0807; border: 1px solid var(--line); border-radius: 4px; }
+    .login button { color: #1c0604; background: var(--red); border-color: var(--red); font-weight: 600; }
+    .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+    .tabs button[aria-pressed="true"] { color: #1c0604; background: var(--red); border-color: var(--red); }
+    #status { min-height: 1.5em; margin: 10px 0; color: var(--muted); }
+    #status.error { color: #ff9c90; }
+    .note { margin-bottom: 12px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: 6px; }
+    .note header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; color: var(--muted); font-size: .78rem; }
+    .note blockquote { margin: 8px 0; font: 600 1.45rem/1.15 var(--hand); overflow-wrap: anywhere; }
+    .note a { color: #ffb0a8; overflow-wrap: anywhere; }
+    .why { margin: 6px 0 0; color: var(--muted); font-size: .78rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .actions .approve { color: #1c0604; background: var(--red); border-color: var(--red); font-weight: 600; }
+    .empty { padding: 30px; color: var(--muted); text-align: center; border: 1px dashed var(--line); border-radius: 6px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>REVIEW DESK</h1>
+    <p class="sub">Approve or hide notes before they go on the wall. Only you can open this: it needs your admin token.</p>
+
+    <form id="login" class="login">
+      <label class="hidden" for="token">Admin token</label>
+      <input id="token" type="password" autocomplete="current-password" placeholder="Paste your MOODIFY_ADMIN_TOKEN" required>
+      <button type="submit">OPEN</button>
+      <p id="login-msg" role="alert" style="flex-basis: 100%; margin: 0; color: #ff9c90;"></p>
+    </form>
+
+    <section id="desk" class="hidden">
+      <div class="bar">
+        <div class="tabs" role="group" aria-label="Which notes">
+          <button type="button" data-status="held" aria-pressed="true">HELD</button>
+          <button type="button" data-status="visible" aria-pressed="false">ON THE WALL</button>
+          <button type="button" data-status="hidden" aria-pressed="false">HIDDEN</button>
+          <button type="button" data-status="crisis" aria-pressed="false">CRISIS</button>
+        </div>
+        <button type="button" id="refresh">REFRESH ↻</button>
+        <button type="button" id="logout">LOCK</button>
+      </div>
+      <p id="status" role="status"></p>
+      <div id="notes"></div>
+    </section>
+  </main>
+
+  <script>
+    // The token lives only in this tab (sessionStorage) and is sent only to this site's admin API.
+    const $ = (id) => document.getElementById(id);
+    let token = "";
+    try { token = sessionStorage.getItem("moodify-admin") || ""; } catch {}
+    let current = "held";
+
+    const LABELS = { held: "held for review", visible: "on the wall", hidden: "hidden", crisis: "crisis (never posted)" };
+    const ACTIONS = { held: ["visible", "hidden"], visible: ["hidden"], hidden: ["visible"], crisis: [] };
+    const BUTTON = { visible: "APPROVE", hidden: "HIDE", held: "HOLD" };
+
+    function setStatus(text, error = false) { $("status").textContent = text; $("status").classList.toggle("error", error); }
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, { ...options, headers: { ...(options.headers || {}), Authorization: `Bearer ${token}` } });
+      if (response.status === 404 && path.startsWith("/api/admin/capsules?")) throw new Error("token");
+      if (!response.ok) throw new Error(String(response.status));
+      return response.json();
+    }
+
+    function card(capsule) {
+      const note = document.createElement("article");
+      note.className = "note";
+      const head = document.createElement("header");
+      const left = document.createElement("span");
+      left.textContent = `#${capsule.id} · ${capsule.mood} · ${capsule.author}`;
+      const right = document.createElement("span");
+      right.textContent = new Date(capsule.created_at).toLocaleString();
+      head.append(left, right);
+      const message = document.createElement("blockquote");
+      message.textContent = capsule.note;
+      const song = document.createElement("a");
+      song.href = capsule.listen_url;
+      song.target = "_blank";
+      song.rel = "noopener noreferrer";
+      song.textContent = `♪ ${capsule.title}${capsule.artist ? ` — ${capsule.artist}` : ""} ↗`;
+      const where = document.createElement("p");
+      where.className = "why";
+      where.textContent = `${capsule.site ? `on ${capsule.site} · ` : ""}${capsule.url || ""}`;
+      const why = document.createElement("p");
+      why.className = "why";
+      why.textContent = `Moderation: ${capsule.moderation || "none recorded"}`;
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      for (const next of ACTIONS[current]) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = BUTTON[next];
+        if (next === "visible") button.className = "approve";
+        button.addEventListener("click", () => move(capsule.id, next, note));
+        actions.append(button);
+      }
+      note.append(head, message, song, where, why, actions);
+      return note;
+    }
+
+    async function load() {
+      setStatus("Loading…");
+      try {
+        const capsules = (await api(`/api/admin/capsules?status=${current}`)).filter((c) => c.source === "community");
+        $("notes").replaceChildren(...capsules.map(card));
+        if (!capsules.length) {
+          const empty = document.createElement("p");
+          empty.className = "empty";
+          empty.textContent = `Nothing ${LABELS[current]} right now.`;
+          $("notes").append(empty);
+        }
+        setStatus(`${capsules.length} ${capsules.length === 1 ? "note" : "notes"} ${LABELS[current]}.`);
+      } catch (error) {
+        if (error.message === "token") return lock("That token didn't work. Check it and try again.");
+        setStatus("Couldn't load notes. Try refreshing.", true);
+      }
+    }
+
+    async function move(id, status, element) {
+      element.querySelectorAll("button").forEach((b) => { b.disabled = true; });
+      try {
+        await api(`/api/admin/capsules/${id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+        element.remove();
+        setStatus(`#${id} is now ${LABELS[status]}.`);
+      } catch {
+        element.querySelectorAll("button").forEach((b) => { b.disabled = false; });
+        setStatus(`Couldn't update #${id}. Try again.`, true);
+      }
+    }
+
+    function open() {
+      $("login").classList.add("hidden");
+      $("desk").classList.remove("hidden");
+      load();
+    }
+
+    function lock(message = "") {
+      token = "";
+      try { sessionStorage.removeItem("moodify-admin"); } catch {}
+      $("desk").classList.add("hidden");
+      $("login").classList.remove("hidden");
+      $("token").value = "";
+      $("token").focus();
+      $("login-msg").textContent = message;
+    }
+
+    $("login").addEventListener("submit", (event) => {
+      event.preventDefault();
+      token = $("token").value.trim();
+      $("login-msg").textContent = "";
+      try { sessionStorage.setItem("moodify-admin", token); } catch {}
+      open();
+    });
+    document.querySelectorAll("[data-status]").forEach((tab) => tab.addEventListener("click", () => {
+      current = tab.dataset.status;
+      document.querySelectorAll("[data-status]").forEach((t) => t.setAttribute("aria-pressed", String(t === tab)));
+      load();
+    }));
+    $("refresh").addEventListener("click", load);
+    $("logout").addEventListener("click", () => lock());
+    if (token) open();
+  </script>
+</body>
+</html>

@@ -38,7 +38,7 @@ Every message then goes through layered moderation before it can reach the publi
 | Rules (always on) | self-harm language, links or contact details in the message, spam | crisis messages are never posted; the sender gets support resources |
 | LLM check | harassment, hate, sexual content, ads, personal information | **held** for review, never published unchecked |
 | Rate limit | more than 3 songs an hour or 10 a day per visitor (salted IP hash, no addresses stored) | 429 |
-| Maintainer | anything the first three missed | hide or approve through a token-protected admin endpoint |
+| Maintainer | anything the first three missed | hide or approve on the review desk at `/admin`, which needs the admin token |
 
 In production `MOODIFY_REQUIRE_MODERATION=1` holds every message if the model key is missing, rather than falling back to rules only.
 
@@ -65,7 +65,7 @@ Read this honestly. I wrote the direct set alongside the keyword list, so 100% t
 
 ## Tests
 
-60 pytest tests cover:
+61 pytest tests cover:
 - the starter set and the mood reader, including every LLM failure mode and a slow model falling back correctly (mocked transport)
 - retrieval ranking and repeat-skipping
 - crisis handling (asserting the model is never called)

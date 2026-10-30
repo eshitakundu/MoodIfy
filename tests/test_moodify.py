@@ -169,3 +169,8 @@ def test_invalid_capsules_are_rejected(client, payload):
 
 def test_index_page_is_served(client):
     assert "MoodIfy" in client.get("/").text
+
+
+def test_review_desk_is_served_and_not_indexed(client):
+    page = client.get("/admin/").text
+    assert "REVIEW DESK" in page and 'content="noindex, nofollow"' in page
