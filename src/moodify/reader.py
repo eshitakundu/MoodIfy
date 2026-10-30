@@ -10,6 +10,7 @@ Two readers share one contract (text -> MoodReading):
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from dataclasses import dataclass
@@ -17,6 +18,19 @@ from dataclasses import dataclass
 import httpx
 
 from .moods import MOODS
+
+log = logging.getLogger("moodify")
+# A free model, so the app costs nothing to run. Free models on OpenRouter all reason before
+# answering, so calls ask for light reasoning, leave room for it, and keep it out of the reply.
+DEFAULT_MODEL = "nvidia/nemotron-3.5-lightning:free"
+MODEL_OPTIONS = {"max_tokens": 1000, "reasoning": {"effort": "low", "exclude": True}}
+
+
+def describe(error: Exception) -> str:
+    """A short, safe reason for logs: the HTTP status and type, never the request body."""
+    if isinstance(error, httpx.HTTPStatusError):
+        return f"HTTP {error.response.status_code} from {error.request.url.host}: {error.response.text[:200]}"
+    return f"{type(error).__name__}: {str(error)[:200]}"
 
 LEXICON: dict[str, tuple[str, ...]] = {
     "joyful": ("happy", "great", "amazing", "excited", "thrilled", "celebrat", "won", "best day",
@@ -85,7 +99,7 @@ class LLMReader:
     def __init__(self, api_key: str | None = None, model: str | None = None,
                  client: httpx.AsyncClient | None = None, fallback: LexiconReader | None = None):
         self.api_key = api_key if api_key is not None else os.getenv("OPENROUTER_API_KEY", "")
-        self.model = model or os.getenv("MOODIFY_MODEL", "openrouter/auto")
+        self.model = model or os.getenv("MOODIFY_MODEL", DEFAULT_MODEL)
         self.client = client  # created on first use: building one loads SSL certificates
         self.fallback = fallback or LexiconReader()
 
@@ -93,13 +107,15 @@ class LLMReader:
         if not self.api_key:
             return self.fallback.read(text)
         try:
-            self.client = self.client or httpx.AsyncClient(timeout=20)
+            self.client = self.client or httpx.AsyncClient(timeout=12)
             response = await self.client.post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {self.api_key}"},
                 json={
                     "model": self.model,
                     "temperature": 0,
+                    # Capped: uncapped, OpenRouter reserves the model's whole output limit up front.
+                    **MODEL_OPTIONS,
                     "messages": [
                         {"role": "system", "content": PROMPT},
                         {"role": "user", "content": text[:1000]},
@@ -110,8 +126,10 @@ class LLMReader:
             content = response.json()["choices"][0]["message"]["content"]
             match = re.search(r"\{.*?\}", content, re.S)
             mood = json.loads(match.group(0))["mood"].strip().lower() if match else ""
-        except Exception:  # network, HTTP, schema: all fall back the same way
+        except Exception as error:  # network, HTTP, schema: all fall back the same way
+            log.warning("mood reader fell back: %s", describe(error))  # never the user's text
             return self.fallback.read(text)
         if mood not in MOODS:
+            log.warning("mood reader fell back: label %r is not a mood", mood[:30])
             return self.fallback.read(text)
         return MoodReading(mood, "llm", 1.0)

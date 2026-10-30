@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 import httpx
 
-from .reader import in_crisis
+from .reader import DEFAULT_MODEL, MODEL_OPTIONS, describe, in_crisis, log
 
 LINK = re.compile(r"https?://|www\.|\b[\w-]+\.(com|net|org|io|in|me|ly|gg|xyz)\b", re.I)
 EMAIL = re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.]+\b")
@@ -64,7 +64,7 @@ async def llm_check(message: str, api_key: str, model: str, client: httpx.AsyncC
         response = await client.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}"},
-            json={"model": model, "temperature": 0, "max_tokens": 60,
+            json={"model": model, "temperature": 0, **MODEL_OPTIONS,
                   "messages": [{"role": "system", "content": PROMPT},
                                {"role": "user", "content": message[:600]}]},
         )
@@ -72,7 +72,8 @@ async def llm_check(message: str, api_key: str, model: str, client: httpx.AsyncC
         content = response.json()["choices"][0]["message"]["content"]
         found = re.search(r"\{.*?\}", content, re.S)
         data = json.loads(found.group(0)) if found else {}
-    except (httpx.HTTPError, KeyError, IndexError, ValueError):
+    except Exception as error:  # any failure holds the message rather than publishing it unchecked
+        log.warning("moderation unavailable: %s", describe(error))
         return Verdict("held", "moderation unavailable", "llm")
     verdict = str(data.get("verdict", "")).lower()
     reason = str(data.get("reason", ""))[:60]
@@ -85,7 +86,7 @@ class Moderator:
     def __init__(self, api_key: str | None = None, model: str | None = None,
                  client: httpx.AsyncClient | None = None):
         self.api_key = api_key if api_key is not None else os.getenv("OPENROUTER_API_KEY", "")
-        self.model = model or os.getenv("MOODIFY_MODERATION_MODEL", os.getenv("MOODIFY_MODEL", "openrouter/auto"))
+        self.model = model or os.getenv("MOODIFY_MODERATION_MODEL", os.getenv("MOODIFY_MODEL", DEFAULT_MODEL))
         self.client = client  # created on first use: building one loads SSL certificates
 
     async def check(self, message: str) -> Verdict:

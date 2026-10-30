@@ -80,7 +80,7 @@ pytest -q
 python evals/run_eval.py
 ```
 
-Optional: set `OPENROUTER_API_KEY` (free at openrouter.ai) to use the LLM reader and moderation, and `MOODIFY_MODEL` to pick a model (default `openrouter/auto`). Without a key everything still works on the keyword reader and moderation rules.
+Optional: set `OPENROUTER_API_KEY` (free at openrouter.ai) to use the LLM reader and moderation, and `MOODIFY_MODEL` to pick a model (default `nvidia/nemotron-3.5-lightning:free`, so it costs nothing to run). Without a key everything still works on the keyword reader and moderation rules.
 
 ## Deployment
 
