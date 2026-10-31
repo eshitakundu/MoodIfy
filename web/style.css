@@ -924,3 +924,16 @@ footer .wordmark { font-size: 2.2rem; }
 .spine { aspect-ratio: 100 / 74; }
 .spine-title { font-size: .98rem; }
 .spine-reels { flex: 0 0 22%; margin: 3% 8%; }
+
+/* Phones: the tape is a picture above one plain card holding both sides. The desktop 3D rules
+   (canvas overhang, one face at a time, flip buttons) must not reach this layout. */
+@media (max-width: 600px) {
+  .c3d .tape-stage { height: auto; margin-bottom: 0; }
+  .c3d .tape-stage > canvas { position: relative; top: 0; height: 280px; }
+  .c3d .tape-hint { position: static; margin: -18px 0 8px; }
+  .c3d .cassette-flipper .cassette-face, .c3d .cassette-flipper.is-flipped .cassette-face { display: block !important; position: relative; }
+  .c3d #flip-cassette, .c3d #back-to-details { display: none !important; }
+}
+.hint-phone { display: none; }
+@media (max-width: 600px) { .hint-desk { display: none; } .hint-phone { display: inline; } }
+@media (max-width: 600px) { .c3d #share button[type=submit] { color: #fff; background: #2f7fd6; border: 0; border-radius: 999px; } .c3d #share.cassette-form .f-sign input { border-color: rgba(36,38,43,.35); } }
