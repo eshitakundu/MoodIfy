@@ -16,7 +16,29 @@ setInterval(updateClock, 1000);
 // Every set cuts between clips like a late-night broadcast switcher.
 // All clips live in one reel (media/reel.mp4, index in reel.json), fetched once and shared by
 // every TV. A cut is a jump inside the reel, so screens never go black while a new file loads.
-const channelVideos = [...document.querySelectorAll(".tv video")];
+// ?room=cave shows the photographed room with its own screens; otherwise the room of empty sets.
+if (new URLSearchParams(location.search).get("room") === "cave") document.querySelector(".cave")?.classList.remove("cave--tunnel");
+const tunnel = document.querySelector(".cave--tunnel");
+document.querySelector(tunnel ? ".cave-screens" : ".cave-holes")?.remove();
+const channelVideos = [...document.querySelectorAll(".tv video, .cave-screen video, .cave-hole video")];
+
+// The room drifts a little with the pointer; the sets in front move more, which reads as depth.
+const caveRoom = document.querySelector(".cave-room");
+if (caveRoom && !reducedMotion && matchMedia("(hover: hover) and (min-width: 901px)").matches) {
+  const layer = caveRoom.querySelector(".cave-layer");
+  const front = caveRoom.querySelectorAll(".tv-checkin");
+  caveRoom.addEventListener("pointermove", (event) => {
+    const box = caveRoom.getBoundingClientRect();
+    const x = (event.clientX - box.left) / box.width - 0.5;
+    const y = (event.clientY - box.top) / box.height - 0.5;
+    layer.style.transform = `translate(${-x * 14}px, ${-y * 9}px)`;
+    front.forEach((set) => { set.style.transform = `translate(${-x * 30}px, ${-y * 16}px)`; });
+  });
+  caveRoom.addEventListener("pointerleave", () => {
+    layer.style.transform = "";
+    front.forEach((set) => { set.style.transform = ""; });
+  });
+}
 const shouldPlay = (video) => !reducedMotion && video.dataset.visible !== "false" && !document.hidden;
 // Slow enough to see the rain and drifting layers before the channel changes.
 const cutInterval = () => 2500 + Math.random() * 1500;
@@ -41,6 +63,12 @@ function runChannels(src, segments) {
     };
     video.addEventListener("loadedmetadata", () => { cut(); if (shouldPlay(video)) video.play().catch(() => {}); }, { once: true });
     video.addEventListener("pause", () => { if (shouldPlay(video)) video.play().catch(() => {}); });
+    // A set that runs past the end of its scene would spill into the next scene in the reel, which
+    // another set may be showing, so it cuts to a free scene first.
+    video.addEventListener("timeupdate", () => {
+      const seg = segments[onAir.get(video)];
+      if (seg && (video.currentTime < seg.start || video.currentTime > seg.start + seg.duration - 0.25)) cut();
+    });
     video.src = src;
     if (reducedMotion) return;
     const flip = () => {
@@ -68,7 +96,9 @@ function runClips() {
 Promise.all([
   fetch("/media/reel.json").then((r) => { if (!r.ok) throw new Error(); return r.json(); }),
   fetch("/media/reel.mp4").then((r) => { if (!r.ok) throw new Error(); return r.blob(); }),
-]).then(([index, blob]) => runChannels(URL.createObjectURL(blob), index.segments)).catch(runClips);
+]).then(([index, blob]) => {
+  runChannels(URL.createObjectURL(blob), index.segments);
+}).catch(runClips);
 if ("IntersectionObserver" in window) {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(({ isIntersecting, target }) => {
@@ -90,7 +120,7 @@ function setListenLinks(capsule) {
   const query = encodeURIComponent(`${capsule.title || capsule.song} ${capsule.artist || ""}`.trim());
   const shared = Boolean(capsule.url);
   $("listen-youtube").href = capsule.listen_url || `https://www.youtube.com/results?search_query=${query}`;
-  $("listen-youtube").textContent = shared ? `OPEN ON ${capsule.site.toUpperCase()} ↗` : "LISTEN ON YOUTUBE ↗";
+  $("listen-youtube").textContent = shared ? `▶ ${capsule.site.toUpperCase()} ↗` : "▶ YOUTUBE ↗";
   $("listen-spotify").href = `https://open.spotify.com/search/${query}`;
   $("listen-spotify").classList.toggle("hidden", shared);
 }
@@ -104,17 +134,24 @@ function showCapsule(capsule, reading, support) {
   $("artist").textContent = capsule.artist || capsule.site || "Community transmission";
   $("note").textContent = capsule.note;
   $("author").textContent = `Shared by ${capsule.author}`;
-  document.querySelector(".result-art").style.setProperty("--mood-color", MOOD_COLORS[capsule.mood] || "#5c5043");
+  $("result").style.setProperty("--mood-color", MOOD_COLORS[capsule.mood] || "#5c5043");
   setListenLinks(capsule);
   const disc = document.querySelector(".disc");
   disc.classList.remove("drop");
   void disc.offsetWidth;
   disc.classList.add("drop");
+  // The answer plays on the same set: the input fades out and the song takes the screen.
   const result = $("result");
+  $("tune-in").classList.add("hidden");
   result.classList.remove("hidden");
-  result.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  result.closest(".tv").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
   result.focus({ preventScroll: true });
 }
+$("back-to-input").addEventListener("click", () => {
+  $("result").classList.add("hidden");
+  $("tune-in").classList.remove("hidden");
+  $("feeling").focus();
+});
 function setBusy(isBusy) {
   document.querySelectorAll("[data-mode], #random-channel, #another").forEach((button) => { button.disabled = isBusy; });
 }
@@ -144,9 +181,11 @@ async function findByText(mode) {
 async function findRandomChannel() {
   lastRequest = { kind: "random" };
   const guide = document.querySelector(".tv-guide .screen");  // a burst of static as the set retunes
-  guide.classList.remove("static");
-  void guide.offsetWidth;
-  guide.classList.add("static");
+  if (guide) {
+    guide.classList.remove("static");
+    void guide.offsetWidth;
+    guide.classList.add("static");
+  }
   $("match-status").textContent = "Scanning the community frequency…";
   setBusy(true);
   try {
@@ -197,7 +236,7 @@ $("copy-capsule").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(text);
     $("copy-capsule").textContent = "COPIED ✓";
-    setTimeout(() => { $("copy-capsule").textContent = "COPY THIS SONG"; }, 1800);
+    setTimeout(() => { $("copy-capsule").textContent = "COPY"; }, 1800);
   } catch { $("copy-capsule").textContent = "COPY NOT AVAILABLE"; }
 });
 
@@ -227,7 +266,54 @@ $("flip-cassette").addEventListener("click", () => {
 });
 $("back-to-details").addEventListener("click", () => setCassetteSide("front"));
 
+// The community rack: each shared song is a cassette spine in its sender's shell colour.
+const SHELL = { smoke: "#3a414b", clear: "#d9e1ea", black: "#15161a", mint: "#7fd8b4", lilac: "#b4a0ea", sky: "#84c4f2", amber: "#f0ae4a", rose: "#f09cb4" };
+let openTape = null;
 function makeWallNote(capsule) {
+  const tape = document.createElement("button");
+  tape.type = "button";
+  tape.className = "spine";
+  tape.setAttribute("role", "listitem");
+  tape.style.setProperty("--shell", SHELL[capsule.color] || SHELL.smoke);
+  tape.style.setProperty("--tilt", `${(capsule.id * 37 % 7) - 3}deg`);
+  const title = capsule.title || capsule.song;
+  const label = document.createElement("span");
+  label.className = "spine-label";
+  const name = document.createElement("span");
+  name.className = "spine-title";
+  name.textContent = title;
+  const reels = document.createElement("span");
+  reels.className = "spine-reels";
+  reels.append(document.createElement("i"), document.createElement("i"));
+  const by = document.createElement("span");
+  by.className = "spine-by";
+  by.textContent = `— ${capsule.author}`;
+  label.append(name, reels, by);
+  tape.append(label);
+  tape.setAttribute("aria-label", `${title}, shared by ${capsule.author}. Open the note.`);
+  tape.addEventListener("click", () => {
+    if (openTape) openTape.classList.remove("is-out");
+    if (openTape === tape) { openTape = null; $("rack-reader").classList.add("hidden"); return; }
+    openTape = tape;
+    tape.classList.add("is-out");
+    $("rr-mood").textContent = (capsule.mood || "").toUpperCase();
+    $("rr-ch").textContent = `CH ${String(capsule.id).padStart(3, "0")}`;
+    $("rr-note").textContent = capsule.note;
+    const showArtist = capsule.artist && !title.toLowerCase().includes(capsule.artist.toLowerCase());
+    $("rr-song").href = capsule.listen_url;
+    $("rr-song").textContent = `▶ ${title}${showArtist ? ` — ${capsule.artist}` : ""} ↗`;
+    $("rr-meta").textContent = [capsule.site && `on ${capsule.site}`, `— ${capsule.author}`].filter(Boolean).join(" · ");
+    $("rack-reader").style.setProperty("--shell", SHELL[capsule.color] || SHELL.smoke);
+    $("rack-reader").classList.remove("hidden");
+  });
+  return tape;
+}
+document.querySelector(".rack-close")?.addEventListener("click", () => {
+  openTape?.classList.remove("is-out");
+  openTape = null;
+  $("rack-reader").classList.add("hidden");
+});
+function makeWallNoteOld(capsule) {
   const article = document.createElement("article");
   article.className = "wall-note tv";
   const head = document.createElement("span");
@@ -313,6 +399,7 @@ shareForm.addEventListener("submit", async (event) => {
     $("wall-status").textContent = data.support ? `${data.message} ${data.support}` : (data.message || "Your note is now part of the signal.");
     $("wall-status").classList.toggle("is-support", Boolean(data.support));
     shareForm.classList.add("hidden");
+    $("tape-stage")?.classList.add("hidden");
     $("cassette-heading").classList.add("hidden");
     $("community-wall").classList.remove("hidden");
     $("community-wall").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
@@ -323,13 +410,73 @@ shareForm.addEventListener("submit", async (event) => {
     setCassetteSide("front");
   } finally {
     button.disabled = false;
-    button.textContent = "PUT IT ON THE WALL ●";
+    button.textContent = "PUT IT ON THE WALL";
   }
 });
 $("share-another").addEventListener("click", () => {
   $("community-wall").classList.add("hidden");
   $("cassette-heading").classList.remove("hidden");
   shareForm.classList.remove("hidden");
+  $("tape-stage")?.classList.remove("hidden");
   setCassetteSide("front");
   shareForm.elements.url.focus();
 });
+
+// The headline types itself, line after line, like a broadcast caption.
+const typed = $("typed");
+if (typed && !reducedMotion) {
+  const lines = ["HOW ARE YOU, REALLY?", "WHAT'S THE FEELING TONIGHT?", "TELL US HOW IT FEELS."];
+  let line = 0, shown = lines[0].length, deleting = true;
+  const step = () => {
+    const target = lines[line];
+    if (deleting) {
+      shown -= 1;
+      if (shown <= 0) { deleting = false; line = (line + 1) % lines.length; }
+    } else if (shown < lines[line].length) {
+      shown += 1;
+    } else {
+      deleting = true;
+      return setTimeout(step, 3800);
+    }
+    typed.textContent = lines[deleting ? line : line].slice(0, Math.max(shown, 0)) || "\u00a0";
+    setTimeout(step, deleting ? 28 : 70);
+  };
+  setTimeout(step, 4200);
+}
+
+// Photo screens change channel every so often, always to a photo no other screen is showing.
+const photoScreens = [...document.querySelectorAll(".hole-still")];
+if (photoScreens.length && !reducedMotion) {
+  fetch("/media/stills/index.json").then((r) => r.json()).then((all) => {
+    const onScreen = new Map(photoScreens.map((el) => [el, el.style.getPropertyValue("--still").match(/\/media[^)"']+/)?.[0]]));
+    const retune = (el) => {
+      const busy = new Set(onScreen.values());
+      const free = all.filter((url) => !busy.has(url));
+      if (free.length) {
+        const next = free[Math.floor(Math.random() * free.length)];
+        el.classList.add("is-tuning");
+        setTimeout(() => {
+          el.style.setProperty("--still", `url(${next})`);
+          onScreen.set(el, next);
+          setTimeout(() => el.classList.remove("is-tuning"), 140);
+        }, 160);
+      }
+      setTimeout(() => retune(el), 6000 + Math.random() * 8000);
+    };
+    photoScreens.forEach((el) => setTimeout(() => retune(el), 2000 + Math.random() * 12000));
+  }).catch(() => {});
+}
+
+// Now and then a set loses signal and drops to static for a moment.
+if (!reducedMotion) {
+  const sets = [...document.querySelectorAll(".cave-hole:not(.hole-static)")];
+  const dropout = () => {
+    const el = sets[Math.floor(Math.random() * sets.length)];
+    if (el && !el.classList.contains("is-dropout")) {
+      el.classList.add("is-dropout", "hole-static");
+      setTimeout(() => el.classList.remove("is-dropout", "hole-static"), 350 + Math.random() * 1100);
+    }
+    setTimeout(dropout, 250 + Math.random() * 900);
+  };
+  if (sets.length) setTimeout(dropout, 1500);
+}

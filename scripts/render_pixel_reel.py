@@ -245,13 +245,15 @@ def render(scene: Scene, index: int) -> Path:
 def build_reel() -> None:
     """Join every clip into media/reel.mp4 with a segment index the page cuts between.
 
-    The clips share one encoding, so they are concatenated without re-encoding."""
+    The wall's screens are small, so the reel is re-encoded at half size with crisp pixel scaling;
+    the per-clip files stay full size for the fallback."""
     clips = sorted(OUT.glob("clip-*.mp4"))
     listing = OUT / "reel.txt"
     listing.write_text("".join(f"file '{clip.name}'\n" for clip in clips), encoding="utf-8")
     reel = OUT.parent / "reel.mp4"
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(listing),
-                    "-c", "copy", "-movflags", "+faststart", str(reel)], check=True)
+                    "-vf", "scale=320:200:flags=neighbor", "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "30",
+                    "-g", "6", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(reel)], check=True)
     listing.unlink()
     segments = [{"start": round(i * SECONDS, 3), "duration": SECONDS} for i in range(len(clips))]
     (OUT.parent / "reel.json").write_text(json.dumps({"duration": len(clips) * SECONDS, "segments": segments}),

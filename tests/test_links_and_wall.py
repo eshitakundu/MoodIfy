@@ -198,3 +198,11 @@ def test_v1_database_is_upgraded_in_place(tmp_path):
     capsules = [c for c in Store(path).all() if c.source == "community"]  # starters get topped up too
     assert [(c.title, c.author) for c in capsules] == [("Old Song", "Mira")]
     assert capsules[0].listen_url.startswith("https://www.youtube.com/results?search_query=")
+
+
+def test_cassette_colour_is_saved_and_checked(tmp_path):
+    client = make_client(tmp_path)
+    saved = share(client, color="mint").json()["capsule"]
+    assert saved["color"] == "mint" and client.get("/api/wall").json()[0]["color"] == "mint"
+    assert share(client, url="https://youtu.be/other", color="neon-plaid").status_code == 422
+    assert share(client, url="https://youtu.be/third").json()["capsule"]["color"] is None

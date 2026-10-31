@@ -51,9 +51,9 @@ class D1Store:
         return rows[0]["n"]
 
     async def add(self, *, mood, note, author, song=None, artist=None, url=None, site=None, thumbnail=None,
-                  status="visible", moderation="", submitter=""):
+                  status="visible", moderation="", submitter="", color=None):
         values = (song, artist, url, site, thumbnail, mood, note, author, "community",
-                  status, moderation, submitter, now())
+                  status, moderation, submitter, now(), color)
         # Python None reaches D1 as undefined, which it rejects, so empty fields are written as SQL null.
         slots = ", ".join("null" if value is None else "?" for value in values)
         rows = await self._rows(f"insert into capsules ({COLUMNS}) values ({slots}) returning *",

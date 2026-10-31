@@ -18,7 +18,7 @@ from .matcher import best_capsule
 from .moderation import Moderator
 from .moods import MOODS, Mood, target_mood
 from .reader import LLMReader, in_crisis
-from .store import Capsule, StoredCapsule, Store
+from .store import CASSETTE_COLORS, Capsule, StoredCapsule, Store
 
 WEB = Path(__file__).resolve().parents[2] / "web"
 URL = re.compile(r"https?://|www\.", re.I)
@@ -63,6 +63,7 @@ class NewCapsule(BaseModel):
     note: str | None = Field(default=None, min_length=10, max_length=280)
     mood: Mood | None = None
     name: str = Field(default="", max_length=40)
+    color: Literal[CASSETTE_COLORS] | None = None
 
     @field_validator("message", "title", "song", "artist", "note", "name")
     @classmethod
@@ -169,6 +170,7 @@ def create_app(db_path: str | None = None, reader: LLMReader | None = None,
             song=song, artist=artist, url=link.url if link else None, site=link.site if link else None,
             thumbnail=info.thumbnail, mood=mood, note=body.text, author=body.name or "Anonymous",
             status=verdict.status, moderation=f"{verdict.checked_by}: {verdict.reason}", submitter=submitter,
+            color=body.color,
         ))
         public = Capsule(**saved.model_dump(include=set(Capsule.model_fields)))
         return SubmitResponse(
