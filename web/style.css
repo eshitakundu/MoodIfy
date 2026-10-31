@@ -894,3 +894,33 @@ footer .wordmark { font-size: 2.2rem; }
 /* A dimming layer over the wall (under the front set), darkest at the edges, so the front TV leads. */
 .cave--tunnel .cave-room::before { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
   background: radial-gradient(ellipse 46% 58% at 50% 66%, rgba(0,0,0,.18), rgba(0,0,0,.5) 70%, rgba(0,0,0,.72) 100%); }
+/* An older rule gave these width:100%, which pushed them past the side letter and off the label. */
+@media (min-width: 601px) { .c3d #share .f-url, .c3d #share .f-message { width: auto; overflow: hidden; } }
+/* Side B: submit on the left, signature on the right, and a small flip icon up by the side letter. */
+@media (min-width: 601px) {
+  .c3d .cassette-back-actions { justify-content: space-between; }
+  .c3d .cassette-back-actions button[type=submit] { order: -1; }
+  .c3d .cassette-back-actions .f-sign { flex: 0 1 48%; }
+  .c3d #share #back-to-details { position: absolute; top: calc(-86cqh + 4%); right: calc(4cqh + 5.5%); width: 8cqh; height: 8cqh; padding: 0; border-color: rgba(36,38,43,.35); font: 600 4.6cqh/1 var(--mono); }
+}
+/* Caveat's glyphs sit outside a tight line box, so give the handwritten titles room before clipping. */
+.spine-title { flex: none; line-height: 1.4; padding-bottom: 1px; }
+.spine-reels { margin-top: 2%; }
+@media (min-width: 601px) { .c3d #share #back-to-details { top: -73cqh; right: 8cqh; width: 9.5cqh; height: 9.5cqh; font-size: 5.4cqh; } }
+/* The flip icon sits on the label beside the side letter; submit far left, signature far right. */
+@media (min-width: 601px) {
+  .c3d #share #back-to-details { top: 7%; right: 11%; width: 9.5cqh; height: 9.5cqh; padding: 0; }
+  .c3d #share .cassette-back-actions .f-sign { flex: 0 1 44%; margin-left: auto; }
+}
+/* Shell colours are a choice you make with the tape in hand, so they only appear once it's open. */
+@media (min-width: 601px) {
+  .c3d .tape-stage[data-state="idle"] .tape-colors { display: none; }
+  .c3d .tape-stage[data-state="idle"] .tape-hint { bottom: 20px; }
+}
+.spine-reels { flex: 0 0 30%; margin-bottom: 3%; }
+.spine-by { flex: none; line-height: 1.3; }
+.spine-label { padding: 5% 8% 9%; box-shadow: inset 0 -4px 0 #1b1d22; }
+.spine-reels { flex: 0 0 26%; }
+.spine { aspect-ratio: 100 / 74; }
+.spine-title { font-size: .98rem; }
+.spine-reels { flex: 0 0 22%; margin: 3% 8%; }

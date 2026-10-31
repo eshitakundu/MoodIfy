@@ -409,7 +409,7 @@ function frame() {
 
 document.querySelector(".broadcast")?.classList.add("c3d");
 const note = document.querySelector(".broadcast-note");
-if (note) note.textContent = "Pick a colour. Click the tape and write on its label, then flip it for side B.";
+if (note) note.textContent = "Click the tape to write on its label and pick its colour, then flip it for side B.";
 form.inert = !phone.matches;
 phone.addEventListener("change", () => { form.inert = state !== "open" && !phone.matches; });
 stage.dataset.state = "idle";
